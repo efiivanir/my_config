@@ -1,0 +1,576 @@
+OS_TYPE=`uname`
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+export MAIL_USERNAME='efi.ivanir.unsc'
+export MAIL_PASSWORD='agoodpass'
+export MAIL_SERVER=smtp.googlemail.com
+export MAIL_PORT=587
+export MAIL_USE_TLS=1
+export FLASKY_ADMIN='efi.ivanir.unsc@gmail.com'
+
+export CONSUMER_KEY='QJOd7qDHNjyjZY4RnT5bNe4Ps'
+export CONSUMER_SECRET_KEY='3UHxjMBSygVDy4GMwLgAlxif7Bgwmxy8w2rIDAdMuLrHkdIaJY'
+export API_KEY='380714812-vtXB3QGddFXGO7pV2ohgSy1NtWGDj50BgOO0VGhP'
+export API_SECRET_KEY='gx6RMAuQbynqO3HJ8AEQ2yOBzQdtl2Q5CSPOPi03ehJjc'
+
+# pipenv create virtual under project
+export PIPENV_VENV_IN_PROJECT=1
+export QUANDL_KEY='Bjha5ycN1g5kPPmyPxTv'
+export FMP_KEY='54e05451c902fba8bdd7b3aacb8aef76'
+export HER_KEY='Peleg0511'
+export ES_JAVA_OPTS="-Xms256m -Xmx256m"
+
+#alias ch-locals='sudo locale-gen en_US.UTF-8;sudo dpkg-reconfigure locales'
+alias ch-locals='sudo locale-gen en_US.UTF-8'
+
+alias soc='source ~/.bashrc'
+# Scan network
+alias ar-sc='arp-scan  -l'
+
+# dump to hex, content of bin file
+alias dump_bin_file='od -t x1 -A n '
+# Raspberry
+alias rpi-ssh='ssh -X pi@raspberrypi.local'
+
+alias sys-version='systemctl --version'
+alias sys-anal-time='systemd-analyze time'
+alias sys-list-services='systemctl list-units -t service'
+alias sys-status='systemctl status '
+alias sys-stop='sudo systemctl stop '
+
+alias ls-blk='lsblk'
+alias ls-partitions='cat /proc/partitions'
+
+alias ls-installed-packages='apt list --installed'
+
+alias check-disk-param='sudo hdparm -tT '
+alias check-badblocks='badblocks '
+
+alias catinfo='cat /proc/cpuinfo'
+alias catversion='cat /proc/version'
+alias catmem='cat /proc/meminfo'
+alias catpart='cat /proc/partitions'
+
+# create etags for emacs source
+alias emacs-src-etags='find . -name '*.el' -print | etags -; find . -name '*.[ch]' -print | etags --append -'
+
+alias lt='ls -lat| more'
+alias cx='chmod 755 '
+alias aguu='sudo apt-get update ; sudo apt-get upgrade -y'
+alias agi='sudo apt-get install -y '
+alias ags='sudo apt-cache search '
+alias agshow='apt show '
+alias dp-qu='dpkg-query -l | grep '
+alias sync_2T1='sudo rsync -avu --delete "/media/ivanir/2T-1" "/media/ivanir/misc/"'
+
+alias pyV='python3 -V'
+alias jup-not='jupyter-notebook  --allow-root'
+
+# gcloud
+alias gc-cil='gcloud compute instances list'
+alias gc-sil='gcloud sql instances list'
+alias gc-csp='gcloud config set project '
+alias gc-pl='gcloud projects list'
+alias gc-cs='gcloud compute ssh '
+alias gc-pd='gcloud projects delete '
+# django
+alias dj-shell='python3 manage.py shell'
+alias dj-mkprj='django-admin startproject '
+alias dj-runserver='python3 manage.py runserver'
+alias dj-mkapp='python3 manage.py startapp '
+alias dj-mig='python3 manage.py makemigrations ; python3 manage.py migrate'
+alias dj-cresup='python3 manage.py createsuperuser'
+alias dj-shell='python3 manage.py shell'
+
+# npm
+alias npm-update-g='sudo npm update -g'
+alias npm-update-l='sudo npm update'
+alias npm-outdated-g='sudo npm outdated -g'
+alias npm-list-g='sudo npm list -g --depth 0'
+alias npm-rm-g='npm -g uninstall --save '
+alias npx-new='npx -p @angular/cli ng new '
+
+# networking
+alias nmcli-con-BeSpot='nmcli dev wifi con "BeSpotADC4_2.4" password "0302ADC4"'
+alias nmcli-show='nmcli device wifi list'
+
+# react
+function react-new-app {
+    if [ $# -eq 0 ]
+    then
+        echo "No arguments supplied"
+    else
+        npx create-react-app $1
+        cd $1
+    fi
+    
+}
+# Angular
+
+function angular-new-app {
+    if [ $# -eq 0 ]
+    then
+        echo "No arguments supplied"
+    else
+        ng new $1 --defaults --routing --skip-tests --commit
+        cd $1
+    fi
+    
+}
+
+function angular-new-component {
+    if [ $# -eq 0 ]
+    then
+        echo "No arguments supplied"
+    else
+        ng g c $1  --skip-tests 
+        
+    fi
+    
+}
+
+function angular-new-service {
+    if [ $# -eq 0 ]
+    then
+        echo "No arguments supplied"
+    else
+        ng g service $1 
+        
+    fi
+    
+}
+
+
+git config --global user.email "efi.ivanir@gmail.com"
+git config --global user.name "Ivanir Efi"
+git config --global core.editor "vim"
+git config --global color.ui auto
+git config --global http.sslVerify false
+git config --global push.followTags true
+
+git config --global merge.tool diffmerge
+git config --global mergetool.diffmerge.cmd "/usr/bin/diffmerge --merge --result=\"\$MERGED\" \"\$LOCAL\" \"\$BASE\" \"\$REMOTE\""
+git config --global mergetool.diffmerge.trustExitCode true
+git config --global mergetool.keepBackup false
+git config --global diff.tool diffmerge
+git config --global difftool.diffmerge.cmd "/usr/bin/diffmerge --nosplash \"\$LOCAL\" \"\$REMOTE\""
+
+alias git-push="git push origin master --tags"
+alias git-sta="git status"
+alias git-reset-hard='git reset HEAD '
+alias git-reset-soft='git reset --soft HEAD^ '
+alias git-ch='git checkout '
+alias git-clean='git checkout -- .'
+alias git-show-remote='git remote --verbose'
+alias git-graph='git log --oneline --graph'
+
+alias heroku-push='git push heruko master'
+
+alias perl-update-all='sudo perl -MCPAN -e "upgrade /(.\*)/"'
+alias python-update-all='sudo pip3 freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip3 install -U'
+alias youtube-playlist='youtube-dl -i '
+
+alias calibre-the-econo-expl='ebook-convert /root/.emacs.d/calibre_recepies/The_Economist_Explain.recipe The_Economist_Explain.epub'
+alias calibre-the-econo='ebook-convert /root/.emacs.d/calibre_recepies/The_Economist.recipe The_Economist.epub'
+
+alias gcc-list-c++-options='gcc -xc++ -E -v -'
+alias gcc-list-c-options='gcc -xc -E -v -'
+
+alias pulse-start='pulseaudio --system &'
+alias gh='history | grep '
+function root-enable {
+    sudo passwd root
+    sudo passwd -u root
+}
+
+
+function rtl8821ae {
+    sudo modprobe rtl8821ae -r
+    sudo modprobe rtl8821ae
+    sudo lshw -C network
+    lsmod | grep rtl
+
+    git clone https://github.com/lwfinger/rtlwifi_new.git
+    chdir rtlwifi_new
+
+    sudo make
+    sudo make install
+    sudo reboot
+
+    iwlist scan | egrep -i 'ssid|level'
+
+    sudo modprobe -r rtl8821ae
+    sudo modprobe rtl8821ae ant_sel=1
+    iwlist scan | egrep -i 'ssid|level'
+
+    sudo modprobe -r rtl8821ae
+    sudo modprobe rtl8821ae ant_sel=2
+    iwlist scan | egrep -i 'ssid|level'
+
+
+}
+
+function rtl8821ae_up {
+    sudo modprobe -r rtl8821ae
+    sudo modprobe rtl8821ae ant_sel=2 fwlps=N msi=1 power_save=0 
+}
+
+function wicd_install {
+    sudo apt-get install -d --reinstall network-manager network-manager-gnome 
+    sudo apt-get install wicd-gtk 
+    sudo apt-get remove network-manager-gnome network-manager 
+    sudo dpkg --purge network-manager-gnome network-manager
+}
+
+function wicd_remove {
+    sudo apt-get install network-manager-gnome network-manager 
+    sudo apt-get remove wicd wicd-gtk 
+    sudo dpkg --purge wicd wicd-gtk
+}
+
+function git_com_with_date {
+    DATE=`date +%Y-%m-%d`
+}
+
+function flask-venv {
+    python3 -m venv venv
+    source venv/bin/activate
+}
+
+alias ac='source venv/bin/activate'
+alias deac='deactivate'
+alias req_w='pip freeze > requirements.txt'
+
+
+
+function get-myip {
+    web_page=`wget http://www.bobborst.com/tools/whatsmyip -O - -q`
+    echo $web_page | perl -nlae 'if(/Your external IP address is:\s+([0-9\.]+)/) {print $1}'
+}
+
+function install-qemu-rasp {
+    mkdir rsp
+    cd rsp
+
+    curl -OL https://github.com/dhruvvyas90/qemu-rpi-kernel/raw/master/kernel-qemu-4.4.34-jessie 
+    export RPI_KERNEL=./kernel-qemu-4.4.34-jessie
+
+    curl \
+        -o 2017-03-02-raspbian-jessie.zip \
+        -L http://downloads.raspberrypi.org/raspbian/images/raspbian-2017-03-03/2017-03-02-raspbian-jessie.zip
+
+    unzip 2017-03-02-raspbian-jessie.zip
+    export RPI_FS=./2017-03-02-raspbian-jessie.img
+
+    export QEMU=$(which qemu-system-arm)
+
+    # prepare the image
+    SECTOR1=$( fdisk -l $RPI_FS | grep FAT32 | awk '{ print $2 }' )
+    SECTOR2=$( fdisk -l $RPI_FS | grep Linux | awk '{ print $2 }' )
+    OFFSET1=$(( SECTOR1 * 512 ))
+    OFFSET2=$(( SECTOR2 * 512 ))
+ 
+    mkdir -p tmpmnt
+    sudo mount $RPI_FS -o offset=$OFFSET1 tmpmnt
+    sudo touch tmpmnt/ssh   # this enables ssh
+    sudo umount tmpmnt
+ 
+    sudo mount $RPI_FS -o offset=$OFFSET2 tmpmnt
+    sudo cat > tmpmnt/etc/udev/rules.d/90-qemu.rules <<EOF
+KERNEL=="sda", SYMLINK+="mmcblk0"
+KERNEL=="sda?", SYMLINK+="mmcblk0p%n"
+KERNEL=="sda2", SYMLINK+="root"
+EOF
+ 
+    sudo umount -l tmpmnt
+    qemu-img resize 2017-03-02-raspbian-jessie.img +20G
+}
+
+function qemu-rasp {
+    export QEMU=$(which qemu-system-arm)
+    export RPI_KERNEL=./kernel-qemu-4.4.34-jessie
+    export RPI_FS=./2017-03-02-raspbian-jessie.img
+    cd ~/rsp
+    
+    $QEMU   -kernel $RPI_KERNEL   -cpu arm1176   -m 256   -M versatilepb   -no-reboot   -serial stdio \
+            -append "root=/dev/sda2 panic=1 rootfstype=ext4 rw"   -drive "file=$RPI_FS,index=0,media=disk,format=raw"  \
+            -net user,hostfwd=tcp::5022-:22   -net nic
+}
+
+function clean-sql {
+    sudo rm -rf /var/lib/mysql
+    sudo rm -rf /etc/mysql*
+    sudo apt-get -y remove --purge mysql-server mysql-client mysql-common
+    sudo apt-get -y remove --purge 'mariadb*'
+    sudo apt-get autoremove
+    sudo apt-get autoclean
+
+}
+
+function mandatory-installed-programs {
+    mandatory_programs="git build-essential nasm genisoimage bochs bochs-sdl qemu  systemd-bootchart net-tools youtube-dl ffmpeg emacs caja-dropbox"
+    sudo apt-get install $mandatory_programs -y
+}
+
+function samba-install {
+    sudo apt install samba -y
+    whereis samba
+    
+    sudo rm -f /etc/samba/smb.conf
+    sudo touch /etc/samba/smb.conf
+    sudo  -i -- sh -c 'echo "[sambashare]" >> /etc/samba/smb.conf &&  echo "comment = Samba on Ubuntu" >> /etc/samba/smb.conf'
+    sudo  -i -- sh -c 'echo "path = /media/ivanir/misc" >> /etc/samba/smb.conf && echo "read only = no" >> /etc/samba/smb.conf'
+    sudo  -i -- sh -c 'echo "browsable = yes" >> /etc/samba/smb.conf'
+    sudo service smbd restart
+    sudo smbpasswd -a ivanir
+}
+
+function npm-remove {
+    dpkg -l | grep -i node
+    sudo apt remove --purge node-* -y
+    sudo apt remove --purge nodejs -y
+}
+
+function webm2mp3 {
+    for FILE in *.webm; do
+        echo -e "Processing video '\e[32m$FILE\e[0m'";
+        ffmpeg -i "${FILE}" -vn -ab 128k -ar 44100 -y "${FILE%.webm}.mp3";
+    done;
+}
+
+function mp42mp3 {
+    for FILE in *.mp4; do
+        echo -e "Processing video '\e[32m$FILE\e[0m'";
+        ffmpeg -i "${FILE}" -vn -ar 44100 -ac 2 -ab 192k -f mp3 "${FILE%.mp4}.mp3";
+    done;
+}
+
+
+function mp3-strip {
+
+
+    oktags="TALB APIC TCON TPE1 TPE2 TPE3 TIT2 TRCK TYER TCOM TPOS"
+
+    indexfile=`mktemp`
+
+    #Determine tags present:
+    find . -iname "*.mp3" -exec eyeD3 --no-color -v {} \; > $indexfile
+    tagspresent=`sort -u $indexfile | awk -F\): '/^<.*$/ {print $1}' \
+| uniq | awk -F\)\> '{print $1}' | awk -F\( '{print $(NF)}' \
+| awk 'BEGIN {ORS=" "} {print $0}'`
+
+    rm $indexfile
+
+    #Determine tags to strip:
+    tostrip=`echo -n $tagspresent $oktags $oktags \
+| awk 'BEGIN {RS=" "; ORS="\n"} {print $0}' | sort | uniq -u \
+| awk 'BEGIN {ORS=" "} {print $0}'`
+
+    #Confirm action:
+    echo
+    echo The following tags have been found in the mp3s:
+    echo $tagspresent
+    echo These tags are to be stripped:
+    echo $tostrip
+    echo
+    echo -n Press enter to confirm, or Ctrl+C to cancel...
+
+    read dummy
+
+    #Strip 'em
+    stripstring=`echo $tostrip | awk 'BEGIN {FS="\n"; RS=" "} {print "--set-text-frame=" $1 ": "}'`
+
+    # First pass copies any v1.x tags to v2.3 and strips unwanted tag data.
+    # Second pass removes v1.x tags, since I don't like to use them.
+    # Without --no-tagging-time-frame, a new unwanted tag is added.  :-)
+
+    find . -iname "*.mp3" \
+         -exec eyeD3 --to-v2.3 --no-tagging-time-frame $stripstring '{}' \; \
+         -exec eyeD3 --remove-v1 --no-tagging-time-frame {} \; 
+
+    echo "Function  complete!"
+}
+
+function mp3-test-fast {
+    # sudo apt-get install ffmpeg lltag eyed3 mp3info id3v2 libimage-exiftool-perl libid3-tools id3tool
+
+    keyword='fill_me_in'
+
+    getTitleFF()   { ffprobe "$1" 2>&1 | sed -E -n 's/^ *title *: (.*)/\1/p'; }
+    getTitleLL()   { lltag --show-tags title "$1" | sed -nE 's/^  TITLE=(.*)/\1/p'; }
+    getTitleEyed() { eyeD3 2>&1 "$1" | sed -n 's|\x1b\[[0-9;]*mtitle[^:]*: ||p'; }
+    getTitleInfo() { mp3info -p %t "$1"; }
+    getTitleId3()  { id3v2 -l "$1" | sed -nE 's/^(TIT2 \([^)]*\)|Title *): (.*)/\2/p'; }
+    getTitleExif() { exiftool -title -b "$1"; }
+    getTitleId3i() { id3info "$1" | sed -nE 's/^=== TIT2 \([^)]*\): //p'; }
+    getTitleTool() { id3tool "$1" | sed -n 's|^Song Title:\t||p'; }
+
+    for prog in FF LL Eyed Info Id3 Exif Id3i Tool; do
+        echo "=== getTitle${prog} ==="
+        time \
+            for file in *.mp3; do 
+    if "getTitle${prog}" "$file" | grep -q "$keyword"; then 
+        echo "$file"
+    fi
+done
+done
+}
+
+
+function flask-curl-test {
+    curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"email":"xyz@qaaaaaa.perl.com","password":"xyz1234"}' \
+  http://localhost:5000/api/auth/signup
+}
+#lightdm
+# /etc/lightdm/lightdm.conf.d/50-ubuntu.conf
+# [greeter]
+# font-name = Ubuntu Medium Italic 14
+# greeter-show-manual-login=true
+
+# /etc/lightdm/lightdm.conf
+# [SeatDefaults]
+# font-name = Ubuntu Medium Italic 14
+# greeter-show-manual-login=true
+
+
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+#if [ "$NAME" != "DESKTOP-QRKIKF3" ]; then
+#    setxkbmap -option caps:none
+#fi
+
+
+function flask-create-project {
+    if [ $# -eq 0 ]
+    then
+        echo "No arguments supplied"
+    else
+        project=$1
+        project_name="flask-${project}"
+        root_dir=$project_name
+        
+        rm -rf $project_name
+        mkdir $project_name && cd $project_name
+        py-create-venv 
+        py-create-git $project_name
+    fi
+}
+
+function py-create-flask-project {
+    if [ $# -eq 0 ]
+    then
+        echo "No arguments supplied"
+    else
+        project=$1
+        project_name=$project
+        root_dir=$project_name
+
+        rm -rf $project_name
+        mkdir $project_name && cd $project_name
+        py-create-flask-venv
+        py-create-flaskenv $project
+        py-create-git $project_name
+        mkdir -p templates static/js static/css static/img views viewmodels data tests
+        touch app.py
+    fi        
+}
+
+function py-create-venv {
+    python3 -m venv venv
+    source venv/bin/activate
+
+    echo "setuptools" > requirements.txt
+    echo "wheel" >> requirements.txt
+    echo "flask" >> requirements.txt
+    echo "flask-bootstrap" >> requirements.txt
+    echo "flask-debugtoolbar" >> requirements.txt
+    echo "flask-login" >> requirements.txt
+    echo "flask-migrate" >> requirements.txt
+    echo "flask-shell-ipython" >> requirements.txt
+    echo "flask-sqlalchemy" >> requirements.txt
+    echo "flask-wtf" >> requirements.txt
+    echo "gunicorn" >> requirements.txt
+    echo "ipython" >> requirements.txt
+    echo "matplotlib" >> requirements.txt        
+    echo "numpy" >> requirements.txt
+    echo "openpyxl" >> requirements.txt
+    echo "pandas" >> requirements.txt
+    echo "pandasgui" >> requirements.txt
+    echo "pytest" >> requirements.txt
+    echo "pytest-cov" >> requirements.txt
+    echo "python-dotenv" >> requirements.txt
+    echo "requests" >> requirements.txt        
+    echo "scipy" >> requirements.txt
+    echo "simfin" >> requirements.txt
+    echo "tables" >> requirements.txt
+    echo "xlrd" >> requirements.txt
+
+    pip install -r requirements.txt -U
+        
+}
+
+function py-create-flask-venv {
+    python3 -m venv venv
+    source venv/bin/activate
+
+    echo "setuptools" > requirements.txt
+    echo "wheel" >> requirements.txt
+    echo "flask" >> requirements.txt
+    echo "sqlalchemy" >> requirements.txt
+    echo "passlib" >> requirements.txt
+    
+
+    echo "-r  requirements.txt" > requirements-dev.txt
+    echo "ipython" >> requirements-dev.txt
+    echo "pytest" >> requirements-dev.txt
+    echo "pytest-cov" >> requirements-dev.txt
+    echo "python-dotenv" >> requirements-dev.txt
+    echo "webtest" >> requirements-dev.txt
+    
+    
+    pip install -r requirements-dev.txt -U
+        
+}
+
+function py-create-git {
+    if [ $# -eq 0 ]
+    then
+        echo "No project name  supplied"
+    else
+        echo ".idea/" > .gitignore
+        echo "venv/" >> .gitignore
+        echo "__pycache__/" >> .gitignore
+        echo "*.py[cod]" >> .gitignore
+        echo "db.sqlite3" >> .gitignore
+
+        
+        git init
+        git remote add origin "https://github.com/efiivanir/$1.git"
+        git add --all
+        git commit -m "Init"
+    fi
+}
+
+function py-create-flaskenv {
+    if [ $# -eq 0 ]
+    then
+        echo "No project name  supplied"
+    else
+        echo "FLASK_APP=$1.py" > .flaskenv
+        echo "FLASK_ENV=development" >> .flaskenv
+        echo "APP_SETTINGS=\"config.DevelopmentConfig\"" >> .flaskenv  
+    fi
+}
+
+
+
+
+#mongoimport --uri "mongodb+srv://analytics:analytics@mflix.zp5w8.mongodb.net/mflix?retryWrites=true&w=majority" movies_initial.csv --type csv --headerline
+#source /usr/local/bin/virtualenvwrapper.sh
