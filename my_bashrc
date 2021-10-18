@@ -95,6 +95,7 @@ alias npx-new='npx -p @angular/cli ng new '
 
 # networking
 alias nmcli-con-BeSpot='nmcli dev wifi con "BeSpotADC4_2.4" password "0302ADC4"'
+alias nmcli-con-efi='nmcli dev wifi con "efi" password "0547884102"'
 alias nmcli-show='nmcli device wifi list'
 
 # react
@@ -569,7 +570,12 @@ function py-create-flaskenv {
     fi
 }
 
-
+function requirements_create {
+    touch requirements.txt
+    echo "setuptools" >> requirements.txt
+    echo "wheel" >> requirements.txt
+    echo "ipython" >> requirements.txt
+}
 
 
 #mongoimport --uri "mongodb+srv://analytics:analytics@mflix.zp5w8.mongodb.net/mflix?retryWrites=true&w=majority" movies_initial.csv --type csv --headerline
