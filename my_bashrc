@@ -578,5 +578,9 @@ function requirements_create {
 }
 
 
-#mongoimport --uri "mongodb+srv://analytics:analytics@mflix.zp5w8.mongodb.net/mflix?retryWrites=true&w=majority" movies_initial.csv --type csv --headerline
-#source /usr/local/bin/virtualenvwrapper.sh
+PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
