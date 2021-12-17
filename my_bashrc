@@ -61,7 +61,7 @@ alias lt='ls -lat| more'
 alias cx='chmod 755 '
 alias aguu='sudo apt-get update ; sudo apt-get upgrade -y'
 alias agi='sudo apt-get install -y '
-alias ags='sudo apt-cache search '
+alias ags='apt-cache search '
 alias agshow='apt show '
 alias dp-qu='dpkg-query -l | grep '
 alias sync_2T1='sudo rsync -avu --delete "/media/ivanir/2T-1" "/media/ivanir/misc/"'
@@ -172,13 +172,19 @@ alias heroku-push='git push heruko master'
 
 alias perl-update-all='sudo perl -MCPAN -e "upgrade /(.\*)/"'
 alias python-update-all='sudo pip3 freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip3 install -U'
-alias youtube-playlist='youtube-dl -i '
 
 alias calibre-the-econo-expl='ebook-convert /root/.emacs.d/calibre_recepies/The_Economist_Explain.recipe The_Economist_Explain.epub'
 alias calibre-the-econo='ebook-convert /root/.emacs.d/calibre_recepies/The_Economist.recipe The_Economist.epub'
 
 alias gcc-list-c++-options='gcc -xc++ -E -v -'
 alias gcc-list-c-options='gcc -xc -E -v -'
+
+function youtube-playlist() {
+ id_replacement="'%(autonumber)s-%(title)s.%(ext)s'"
+ youtube-dl  --age-limit 0 -cio $id_replacement $1
+}
+
+
 
 alias pulse-start='pulseaudio --system &'
 alias gh='history | grep '
