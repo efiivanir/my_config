@@ -167,6 +167,7 @@ alias git-ch='git checkout '
 alias git-clean='git checkout -- .'
 alias git-show-remote='git remote --verbose'
 alias git-graph='git log --oneline --graph'
+alias git-rm-local='git  rm --cached'
 
 alias heroku-push='git push heruko master'
 
@@ -178,6 +179,8 @@ alias calibre-the-econo='ebook-convert /root/.emacs.d/calibre_recepies/The_Econo
 
 alias gcc-list-c++-options='gcc -xc++ -E -v -'
 alias gcc-list-c-options='gcc -xc -E -v -'
+
+alias toprog='cd ~/Prog'
 
 function youtube-playlist() {
  id_replacement="'%(autonumber)s-%(title)s.%(ext)s'"
@@ -583,6 +586,25 @@ function requirements_create {
     echo "ipython" >> requirements.txt
 }
 
+function apache-conf-create {
+  if [ $# -eq 0 ]
+    then
+        echo "No project name  supplied"
+    else
+        project=$1
+        echo "<VirtualHost *>" > $project.conf
+        echo "ServerName example.com" >> $project.conf
+        echo "WSGIScriptAlias / /var/www/headlines/$project.wsgi" >> $project.conf
+        echo "WSGIDaemonProcess $project" >> $project.conf
+        echo "<Directory /var/www/$project>" >> $project.conf
+        echo "WSGIProcessGroup $project" >> $project.conf
+        echo "WSGIApplicationGroup %{GLOBAL}" >> $project.conf
+        echo "Order deny,allow" >> $project.conf
+        echo "Allow from all" >> $project.conf
+        echo "</Directory> "  >> $project.conf
+        echo "</VirtualHost>" >> $project.conf
+   fi
+}
 
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
