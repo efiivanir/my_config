@@ -253,12 +253,16 @@ function flask-venv {
 alias ac='source venv/bin/activate'
 alias deac='deactivate'
 alias req_w='pip freeze > requirements.txt'
-
+alias py_http='python3 -m http.server 8001'
 
 
 function get-myip {
     web_page=`wget http://www.bobborst.com/tools/whatsmyip -O - -q`
     echo $web_page | perl -nlae 'if(/Your external IP address is:\s+([0-9\.]+)/) {print $1}'
+}
+
+function wget_mirror {
+  wget --mirror --convert-links --adjust-extension --page-requisites --no-parent $1
 }
 
 function install-qemu-rasp {
@@ -604,6 +608,28 @@ function apache-conf-create {
         echo "</Directory> "  >> $project.conf
         echo "</VirtualHost>" >> $project.conf
    fi
+}
+
+function requirements-django {
+    req="requirements.txt"
+    echo '' >  $req
+    packages=(
+      setuptools
+      wheel
+      ipython
+      django
+      django-extensions
+      pygraphviz
+      werkzeug
+      vobject
+      pyparsing
+      pydot
+)
+
+
+    for t in ${packages[@]}; do
+      echo $t >> $req
+    done
 }
 
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
