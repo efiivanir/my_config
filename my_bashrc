@@ -9,19 +9,8 @@ export MAIL_PASSWORD='agoodpass'
 export MAIL_SERVER=smtp.googlemail.com
 export MAIL_PORT=587
 export MAIL_USE_TLS=1
-export FLASKY_ADMIN='efi.ivanir.unsc@gmail.com'
 
-export CONSUMER_KEY='QJOd7qDHNjyjZY4RnT5bNe4Ps'
-export CONSUMER_SECRET_KEY='3UHxjMBSygVDy4GMwLgAlxif7Bgwmxy8w2rIDAdMuLrHkdIaJY'
-export API_KEY='380714812-vtXB3QGddFXGO7pV2ohgSy1NtWGDj50BgOO0VGhP'
-export API_SECRET_KEY='gx6RMAuQbynqO3HJ8AEQ2yOBzQdtl2Q5CSPOPi03ehJjc'
 
-# pipenv create virtual under project
-export PIPENV_VENV_IN_PROJECT=1
-export QUANDL_KEY='Bjha5ycN1g5kPPmyPxTv'
-export FMP_KEY='54e05451c902fba8bdd7b3aacb8aef76'
-export HER_KEY='Peleg0511'
-export ES_JAVA_OPTS="-Xms256m -Xmx256m"
 
 #alias ch-locals='sudo locale-gen en_US.UTF-8;sudo dpkg-reconfigure locales'
 alias ch-locals='sudo locale-gen en_US.UTF-8'
@@ -67,6 +56,7 @@ alias dp-qu='dpkg-query -l | grep '
 alias sync_2T1='sudo rsync -avu --delete "/media/ivanir/2T-1" "/media/ivanir/misc/"'
 
 alias pyV='python3 -V'
+alias pymakeEnv='python3 -m venv venv'
 alias jup-not='jupyter-notebook  --allow-root'
 
 # gcloud
@@ -190,7 +180,6 @@ function youtube-playlist() {
 
 
 alias pulse-start='pulseaudio --system &'
-alias gh='history | grep '
 function root-enable {
     sudo passwd root
     sudo passwd -u root
@@ -254,12 +243,10 @@ alias ac='source venv/bin/activate'
 alias deac='deactivate'
 alias req_w='pip freeze > requirements.txt'
 alias py_http='python3 -m http.server 8001'
+alias pip-fix='python -m pip install -r requirements.txt -U'
+alias todj='cd ~/Prog/dj_dir'
+alias topy='cd ~/Prog/py_dir'
 
-
-function get-myip {
-    web_page=`wget http://www.bobborst.com/tools/whatsmyip -O - -q`
-    echo $web_page | perl -nlae 'if(/Your external IP address is:\s+([0-9\.]+)/) {print $1}'
-}
 
 function wget_mirror {
   wget --mirror --convert-links --adjust-extension --page-requisites --no-parent $1
@@ -619,6 +606,7 @@ function requirements-django {
       ipython
       django
       django-extensions
+      django-debug-toolbar
       pygraphviz
       werkzeug
       vobject
@@ -631,6 +619,11 @@ function requirements-django {
       echo $t >> $req
     done
 }
+
+
+# Cuda
+export PATH="/usr/local/cuda-12.0/bin:$PATH"
+export LD_LIBRARY_PATH="/usr/local/cuda-12.0/lib64:$LD_LIBRARY_PATH"
 
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
