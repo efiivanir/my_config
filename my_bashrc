@@ -158,6 +158,7 @@ alias git-clean='git checkout -- .'
 alias git-show-remote='git remote --verbose'
 alias git-graph='git log --oneline --graph'
 alias git-rm-local='git  rm --cached'
+alias git-pr-log='git log --date-order --graph --tags --simplify-by-decoration --pretty=format:"%ai %h %d"'
 
 alias heroku-push='git push heruko master'
 
@@ -620,10 +621,28 @@ function requirements-django {
     done
 }
 
-
+export PATH="/home/ivanir/my_local/bin:$PATH"
 # Cuda
 export PATH="/usr/local/cuda-12.0/bin:$PATH"
 export LD_LIBRARY_PATH="/usr/local/cuda-12.0/lib64:$LD_LIBRARY_PATH"
+
+#HyperPV
+alias hpv-start='sudo hyperpv-server-service-start'
+alias hpv-stop='sudo hyperpv-server-service-stop'
+alias hpv-status='hyperpv-server-status'
+alias to_hypv='cd /home/ivanir/Prog/py_dir/hypv'
+
+#Klayout
+#export KLAYOUT_PYTHONPATH='/home/ivanir/Prog/py_dir/KLayout-python;/usr/lib/python310.zip;/usr/lib/python3.10;/usr/lib/python3.10/lib-dynload;/usr/local/lib/python3.10/dist-packages;/usr/lib/python3/dist-packages'
+
+alias kl-sky130='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/sky130_klayout_pdk/sky130_tech klayout -e &'
+alias kl-free45='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/FreePDK45_for_KLayout klayout -e &'
+alias kl-asap7='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/ASAP7_for_KLayout klayout -e &'
+alias kl-tsmc45='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/TSMC45 klayout -e &'
+alias kl-gdsfactory='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gdsfactory klayout -e &'
+alias kl-ltk='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/LTK klayout -e &'
+alias kl-kqc='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/KQC klayout -e &'
+alias kl-si4all='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/si4all klayout -e &'
 
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
