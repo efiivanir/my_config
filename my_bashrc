@@ -644,6 +644,9 @@ alias kl-ltk='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/LTK klayout -e &'
 alias kl-kqc='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/KQC klayout -e &'
 alias kl-si4all='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/si4all klayout -e &'
 
+# Linux kernel programing
+export LLKD_KSRC=${HOME}/kernels/linux-5.4.231
+
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
