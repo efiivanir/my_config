@@ -36,7 +36,8 @@ Yet to me, literate programming is certainly the most important thing that came 
 ** Personal information
 #+BEGIN_SRC emacs-lisp
   (setq user-full-name "Efi Ivanir"
-	user-mail-address "efi.ivanir@gmail.com")
+    user-mail-address "efi.ivanir@gmail.com")
+  (setq debug-on-error t)
 #+END_SRC
 ** Enable Package Support
 I set up packages, Melpa, and use-package bright and early so that I can make use of use-package's bind-key macro.
@@ -58,6 +59,83 @@ Use-package is a handful of things: you can make sure a package is downloaded, e
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+END_SRC
+*** emacs-leuven
+Looking for an Emacs configuration file with many packages already enabled and a more pleasant set of defaults? Here’s the place to find one!
+That will save you hours (and hours) of configuration…
+The “Emacs Leuven” configuration file is packaged as an Emacs Lisp library, and ready to be used by you.
+And it is optimized to keep the Emacs startup time fast (around 2 seconds)!
+
+#+begin_src emacs-lisp
+    ;; Make sure `emacs-leuven.el' is in your `load-path'.
+ (add-to-list 'load-path "/home/ivanir/my_config/my_emacs/emacs-leuven/lisp")
+  ;;; emacs-leuven.el --- Emacs configuration file with more pleasant defaults
+
+;; Copyright (C) 1999-2023 Fabrice Niessen
+
+;; Author: Fabrice Niessen <(concat "fniessen" at-sign "pirilampo.org")>
+;; URL: https://github.com/fniessen/emacs-leuven
+;; Version: <<current-time()>>
+;; Keywords: emacs, dotfile, config
+
+;;
+;;    ___ _ __ ___   __ _  ___ ___
+;;   / _ \ '_ ` _ \ / _` |/ __/ __|
+;;  |  __/ | | | | | (_| | (__\__ \
+;; (_)___|_| |_| |_|\__,_|\___|___/
+;;
+
+;; This file is NOT part of GNU Emacs.
+
+;; This file is free software: you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation, either version 3 of
+;; the License, or (at your option) any later version.
+;;
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this file. If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Emacs 24.4+ configuration file with many packages already enabled and a more
+;; pleasant set of defaults.
+;;
+;; Operating systems: supposed to work both for Windows and for Linux.
+;;
+;; Minimal .emacs configuration file:
+;;
+;;     (add-to-list 'load-path "/path/to/emacs-leuven/")
+;;     (require 'emacs-leuven)
+;;
+;; To get more debug info about the packages getting loaded, add the following
+;; line before requiring Emacs-Leuven.
+;;
+;;     ;; Show messages describing progress of loading Emacs-Leuven.
+     (setq leuven-verbose-loading t)
+;;
+;; To avoid being questioned about packages to add to your local Emacs
+;; installation (though, I think you should install them), add the following
+;; line before requiring Emacs-Leuven.
+;;
+;;     ;; Do not (try to) install extra Emacs packages.
+     (setq package-selected-packages nil)
+;;
+;; To install all the extra packages used hereunder, without being questioned,
+;; add the following line before requiring Emacs-Leuven.
+;;
+;;     ;; Install all extra Emacs packages without asking for confirmation.
+     (setq leuven-install-all-missing-elpa-packages t)
+;;
+;; For help on the Emacs Editor, see (info "(emacs)")  <== `C-x C-e' here!
+
+  ;; Require it as normal.
+ ; (require 'emacs-leuven)
+
+#+end_src
 ** Detection
 *** Detect Operating System
 These functions identify what operating system is hosting Emacs, which can be handy for system specific configuration. I have run Emacs on Windows, OS X, Linux, and BSD. I currently use Linux most of the time, and OS X some of the time, so my configuration is geared towards those. Still, I may want to run my configuration on Windows or BSD in the future so I include those functions.
@@ -556,7 +634,7 @@ Be sure to download the fonts [[https://github.com/edwardtufte/et-book/tree/gh-p
   (global-set-key (kbd "<f4>") 'kill-buffer)
   (global-set-key (kbd "<f7>") 'bh/set-truncate-lines)
   (global-set-key (kbd "<f8>") 'org-cycle-agenda-files)
-  (global-set-key (kbd "<f9> <f9>") 'bh/show-org-agenda)
+  (global-set-key (kbd "<f9> a") 'bh/show-org-agenda)
   (global-set-key (kbd "<f9> b") 'bbdb)
   (global-set-key (kbd "<f9> c") 'calendar)
   (global-set-key (kbd "<f9> f") 'boxquote-insert-file)
@@ -603,7 +681,7 @@ Be sure to download the fonts [[https://github.com/edwardtufte/et-book/tree/gh-p
     ;; now refresh window display (an idiom from simple.el):
     (save-excursion
       (set-window-start (selected-window)
-			(window-start (selected-window)))))
+                        (window-start (selected-window)))))
 
   (defun bh/make-org-scratch ()
     (interactive)
@@ -613,6 +691,14 @@ Be sure to download the fonts [[https://github.com/edwardtufte/et-book/tree/gh-p
   (defun bh/switch-to-scratch ()
     (interactive)
     (switch-to-buffer "*scratch*"))
+
+  (defun bh/show-org-agenda ()
+  (interactive)
+  (if org-agenda-sticky
+      (switch-to-buffer "*Org Agenda( )*")
+    (switch-to-buffer "*Org Agenda*"))
+  (delete-other-windows))
+
 #+END_SRC
 **** 5 Tasks and States
 #+begin_quote

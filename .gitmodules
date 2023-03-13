@@ -1,0 +1,15 @@
+[submodule "shell-leuven"]
+	path = shell-leuven
+	url = https://github.com/fniessen/shell-leuven.git
+[submodule "shell-extras-leuven"]
+	path = shell-extras-leuven
+	url = https://github.com/fniessen/shell-extras-leuven.git
+[submodule "git-leuven"]
+	path = git-leuven
+	url = https://github.com/fniessen/git-leuven.git
+[submodule "docopts"]
+	path = docopts
+	url = https://github.com/docopt/docopts.git
+[submodule "emacs-leuven-theme"]
+	path = emacs-leuven-theme
+	url = https://github.com/fniessen/emacs-leuven-theme.git

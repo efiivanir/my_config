@@ -1,3 +1,8 @@
+source /home/ivanir/my_config/shell-leuven/.bashrc
+export PATH="/home/ivanir/my_config/bin:$PATH"
+export PATH="/home/ivanir/my_config/shell-extras-leuven/bin:$PATH"
+export PATH="/home/ivanir/my_config/git-leuven/bin:$PATH"
+
 OS_TYPE=`uname`
 export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8

@@ -3,6 +3,8 @@ __pycache__
 my_emacs/backups
 my_emacs/auto-save-list
 my_emacs/elpa
-my_emacs/elpa
-my_emacs/elpa
+my_emacs/.recentf
+my_emacs/eln-cache
+my_emacs/places
+my_emacs/session*
 my_emacs/ivanir.el
