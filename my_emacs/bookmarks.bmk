@@ -1,0 +1,10 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("ivanir.org"
+ (filename . "~/my_config/my_emacs/ivanir.org")
+ (front-context-string . "(file-dependents")
+ (rear-context-string . "e 'loadhist)\n  ;")
+ (position . 505351))
+)

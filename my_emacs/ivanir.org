@@ -12,40 +12,6 @@
 
 #+SETUPFILE: ~/org/theme-readtheorg.setup
 
-* Evaluating the current setup
-
-To evaluate the current setup you'll need to launch Emacs in a special way.
-Do so by issuing the following commands:
-
-#+begin_src shell :tangle no
-git clone https://github.com/fniessen/emacs-leuven
-cd emacs-leuven
-emacs -Q -l ./emacs-leuven.el
-#+end_src
-
-You are now running my "improved" Emacs default experience.
-
-* Description
-
-Emacs can be very difficult for the beginner, as many of the default choices may
-seem (and sometimes are) ugly or awkward.
-
-But -- that's the joy of Emacs -- nearly everything can be adjusted!  Hence,
-this set of customizations (from one pathological Emacs tweaker) to "short-cut"
-that initial process.
-
-Quotations:
-
-- "Show me your ~/.emacs and I will tell you who you are." \\
-  -- Bogdan Maryniuk
-
-- "Emacs is like a laser guided missile.  It only has to be slightly
-  mis-configured to ruin your whole day." \\
-  -- Sean McGrath
-
-- "While any text editor can save your files, only Emacs can save your soul." \\
-  -- Per Abrahamsen
-
 * Header
 
 #+name: current-time
@@ -118,16 +84,6 @@ Quotations:
 ;;
 ;; For help on the Emacs Editor, see (info "(emacs)")  <== `C-x C-e' here!
 
-#+end_src
-
-* Code
-
-Some things are "activated" by default in =lisp/loaddefs.el=.
-
-#+begin_src emacs-lisp
-;;; Code:
-
-;; This file is only provided as an example.  Customize it to your own taste!
 #+end_src
 
 * Pre-init
@@ -2126,7 +2082,7 @@ In IntelliJ IDEA, the are recognized in both lower and upper case.
   (defun leuven--highlight-todo-patterns ()
     "Highlight TODO patterns."
     (cond
-     ((derived-mode-p 'org-mode)
+     ((derived-mode-p 'org-mode
       (font-lock-add-keywords nil         ; In the current buffer.
        `((,leuven-todo-patterns-in-org 1 'leuven-todo-patterns-face prepend)) 'end))
      ((not (derived-mode-p 'diff-mode))
