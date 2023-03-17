@@ -167,6 +167,7 @@ alias git-show-remote='git remote --verbose'
 alias git-graph='git log --oneline --topo-order --graph'
 alias git-rm-local='git  rm --cached'
 alias git-pr-log='git log --date-order --graph --tags --simplify-by-decoration --pretty=format:"%ai %h %d"'
+alias git-sub-up='git submodule update --remote'
 
 alias heroku-push='git push heruko master'
 
