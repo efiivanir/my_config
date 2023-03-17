@@ -1,3 +1,4 @@
+export PATH="/snap/bin:$PATH"
 source /home/ivanir/my_config/shell-leuven/.bashrc
 export PATH="/home/ivanir/my_config/bin:$PATH"
 export PATH="/home/ivanir/my_config/shell-extras-leuven/bin:$PATH"
@@ -146,6 +147,7 @@ git config --global core.editor "vim"
 git config --global color.ui auto
 git config --global http.sslVerify false
 git config --global push.followTags true
+git config --global init.defaultBranch master
 
 git config --global merge.tool diffmerge
 git config --global mergetool.diffmerge.cmd "/usr/bin/diffmerge --merge --result=\"\$MERGED\" \"\$LOCAL\" \"\$BASE\" \"\$REMOTE\""
@@ -153,6 +155,7 @@ git config --global mergetool.diffmerge.trustExitCode true
 git config --global mergetool.keepBackup false
 git config --global diff.tool diffmerge
 git config --global difftool.diffmerge.cmd "/usr/bin/diffmerge --nosplash \"\$LOCAL\" \"\$REMOTE\""
+git config --global alias.slog "log --oneline --topo-order --graph"
 
 alias git-push="git push origin master --tags"
 alias git-sta="git status"
@@ -161,7 +164,7 @@ alias git-reset-soft='git reset --soft HEAD^ '
 alias git-ch='git checkout '
 alias git-clean='git checkout -- .'
 alias git-show-remote='git remote --verbose'
-alias git-graph='git log --oneline --graph'
+alias git-graph='git log --oneline --topo-order --graph'
 alias git-rm-local='git  rm --cached'
 alias git-pr-log='git log --date-order --graph --tags --simplify-by-decoration --pretty=format:"%ai %h %d"'
 
