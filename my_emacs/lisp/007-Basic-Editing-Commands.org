@@ -73,38 +73,38 @@ Shortcuts:
 
 #+begin_src emacs-lisp
   ;; Treat undo history as a tree.
-  (with-eval-after-load "undo-tree-autoloads"
-
-    ;; Enable Global-Undo-Tree mode.
-    (global-undo-tree-mode 1))
-
-  (with-eval-after-load "undo-tree"
-
-    (with-eval-after-load "diminish-autoloads"
-      (diminish 'undo-tree-mode))
+  (use-package undo-tree
+  :config
+  ;; Enable Global-Undo-Tree mode.
+    (global-undo-tree-mode 1)
+    (use-package diminish
+    :config
+       (diminish 'undo-tree-mode)
+    )
+  )
 
     ;; Display times relative to current time in visualizer.
     (setq undo-tree-visualizer-relative-timestamps t)
 
     ;; Display time-stamps by default in undo-tree visualizer.
     (setq undo-tree-visualizer-timestamps t)
-                                        ; Toggle time-stamps display using `t'.
+					; Toggle time-stamps display using `t'.
 
     ;; Display diff by default in undo-tree visualizer.
     (setq undo-tree-visualizer-diff t)  ; Toggle the diff display using `d'.
 
     ;; Redo changes.
     (global-set-key (kbd "C-S-z")   #'undo-tree-redo)
-    (global-set-key (kbd "<S-f11>") #'undo-tree-redo))
+    (global-set-key (kbd "<S-f11>") #'undo-tree-redo)
 #+end_src
 
 Visual feedback on some operations (~undo~, ~yank~, etc.).
 
 #+begin_src emacs-lisp
-  (with-eval-after-load "volatile-highlights-autoloads"
-    (idle-require 'volatile-highlights)
-    (with-eval-after-load "volatile-highlights"
-      (volatile-highlights-mode 1)))
+  (use-package volatile-highlights
+  :config
+     (volatile-highlights-mode 1)
+  ) 
 #+end_src
 
 #+begin_src emacs-lisp

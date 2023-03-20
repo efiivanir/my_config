@@ -21,6 +21,9 @@
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/006-Exiting-Emacs.org")
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/007-Basic-Editing-Commands.org")
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/008-The-Minibuffer.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/010-Help.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/011-The-Mark-and-the-Region.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/012-Killing-and-Moving-Text.org")
 
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/049-Customization.org")
 

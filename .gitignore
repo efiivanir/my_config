@@ -10,3 +10,4 @@ my_emacs/session*
 my_emacs/ivanir.el
 my_emacs/lisp/*.el
 *~
+*#
