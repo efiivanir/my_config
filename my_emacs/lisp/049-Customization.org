@@ -154,25 +154,20 @@ See as well Print keybindings (pkb).
 #+end_src
 
 #+begin_src emacs-lisp
-  ;; Guide the following key bindings automatically and dynamically.
-  (with-eval-after-load "which-key-autoloads"
-    (idle-require 'which-key))
+	;; Guide the following key bindings automatically and dynamically.
+	(use-package which-key
+	:config
+	(which-key-mode)
+	;; Apply suggested settings for side-window that opens on right if there is
+	;; space and the bottom otherwise.
+	(which-key-setup-side-window-right-bottom)
+	(setq which-key-idle-delay 0.4)
+	(setq which-key-sort-order 'which-key-local-then-key-order)
+	;; Set the maximum length (in characters) for key descriptions (commands or
+	;; prefixes).
+	(setq which-key-max-description-length 33)
 
-  (with-eval-after-load "which-key"
-
-    (which-key-mode)
-
-    ;; Apply suggested settings for side-window that opens on right if there is
-    ;; space and the bottom otherwise.
-    (which-key-setup-side-window-right-bottom)
-
-    (setq which-key-idle-delay 0.4)
-
-    (setq which-key-sort-order 'which-key-local-then-key-order)
-
-    ;; Set the maximum length (in characters) for key descriptions (commands or
-    ;; prefixes).
-    (setq which-key-max-description-length 33))
+	)
 #+end_src
 
 ** Syntax Table

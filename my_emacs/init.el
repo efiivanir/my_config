@@ -16,8 +16,12 @@
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/000-Loading-Libraries.org")
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/000-Environment.org")
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/000-Debugging.org")
-(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/000-Debugging.org")
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/048-Emacs-Lisp-Packages.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/001-The-Organization-of-the-Screen.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/006-Exiting-Emacs.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/007-Basic-Editing-Commands.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/008-The-Minibuffer.org")
+
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/049-Customization.org")
 
 ;; Keep emacs Custom-settings in separate file
