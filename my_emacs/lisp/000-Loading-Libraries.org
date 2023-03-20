@@ -1,0 +1,114 @@
+* Loading Libraries of Lisp Code for Emacs
+
+Adding the right Lisp directories to your ~load-path~ (list of directories where
+Emacs Lisp libraries -- ~.el~ and ~.elc~ files -- are installed) must be the very
+*first thing* in your =.emacs= file, before the first time packages are required, to
+make sure that you're not picking up bits and pieces from older files (bundled
+with Emacs, and loaded before the path to the *newest* versions are set).
+
+The most important directories are the last to be added to ~load-path~ (so that
+they become the first of the list)!
+
+Use ~M-x list-load-path-shadows RET~ to display a list of external Emacs Lisp
+files that shadow Emacs builtins (listing potential load path problems).
+
+Some Emacs modes are over 10K lines of code (e.g. ~nxml-mode~, ~CEDET~).  Many
+packages (e.g. ~Org~, ~Gnus~) make use of the ~autoload~ feature, so that you only
+need to load a single file that define autoloaded functions.
+
+#+begin_src emacs-lisp
+;;* Loading Libraries of Lisp Code for Emacs
+
+(leuven--chapter leuven-load-chapter-0-loading-libraries "0 Loading Libraries"
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Load-path enhancement.
+  (defun leuven--add-to-load-path (dir)
+    "Add DIR at the beginning of the `load-path', if it exists and is a directory."
+    (when (and dir (file-directory-p dir))
+      (let ((dir (expand-file-name dir)))
+        (unless (file-exists-p dir)
+          (message "[WARNING: `%s' does not exist.]" dir))
+        (unless (file-exists-p (expand-file-name ".nosearch" dir))
+          (add-to-list 'load-path dir)
+          (when leuven-verbose-loading
+            (message "[Added `%s' to `load-path']" dir))))))
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Remember this directory.
+  (defconst leuven--directory
+    (file-name-directory (or load-file-name (buffer-file-name)))
+    "Directory path of Emacs-Leuven installation.")
+
+  (leuven--add-to-load-path leuven--directory)
+  (leuven--add-to-load-path (concat leuven--directory "../site-lisp"))
+
+  ;; (leuven--add-to-load-path "~/lisp")
+  ;; (leuven--add-to-load-path "~/site-lisp")
+#+end_src
+
+*************** TODO Specify variables using `defcustom'
+
+~leuven-user-lisp-directory~ is there so that you have an easy way of installing
+*your own Emacs add-ons* (which may be specific to the version of Emacs you're
+running).  This keeps your local add-ons apart from distro supplied ones.
+
+It also means you can do a complete re-install of Emacs (or even your Linux
+distro) without impacting on stuff you have added by hand.
+
+#+begin_src emacs-lisp
+  (defvar leuven-user-lisp-directory (concat user-emacs-directory "lisp/")
+    "Directory containing personal additional Emacs Lisp packages.")
+
+  (leuven--add-to-load-path leuven-user-lisp-directory)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Require a feature/library if available; if not, fail silently.
+  (unless (fboundp 'try-require)
+    (defun try-require (feature)
+      "Attempt to load a FEATURE (or library).
+Return true if the library given as argument is successfully loaded.
+If not, just print a message."
+      (condition-case err
+          (progn
+            (if (stringp feature)
+                (load-library feature)
+              (require feature))
+            t)                          ; Necessary for correct behavior in
+                                        ; conditional expressions.
+        (file-error
+         (message "[Requiring `%s'... missing]" feature)
+         nil))))
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; TEMPORARY.
+  (unless (fboundp 'with-eval-after-load)
+    ;; Wrapper around `eval-after-load' (added in GNU Emacs 24.4).
+    (defmacro with-eval-after-load (mode &rest body)
+      "`eval-after-load' MODE evaluate BODY."
+      (declare (indent defun))
+      `(eval-after-load ,mode
+         '(progn ,@body))))
+#+end_src
+
+** Creating and selecting buffers
+
+#+begin_src emacs-lisp
+  (defun switch-or-start (function buffer)
+    "If the BUFFER is current, bury it.  If there is a buffer with that name,
+  switch to it; otherwise, invoke the FUNCTION."
+    (if (equal (buffer-name (current-buffer)) buffer)
+        (bury-buffer)
+      (if (get-buffer buffer)
+          (switch-to-buffer buffer)
+        (funcall function))))
+#+end_src
+
+#+begin_src emacs-lisp
+)                                       ; Chapter 0-loading-libraries ends here.
+#+end_src
+

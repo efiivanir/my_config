@@ -8,3 +8,5 @@ my_emacs/eln-cache
 my_emacs/places
 my_emacs/session*
 my_emacs/ivanir.el
+my_emacs/lisp/*.el
+*~

@@ -1,0 +1,199 @@
+* Header
+
+#+name: current-time
+#+begin_src emacs-lisp :eval yes :results silent :tangle no :exports none
+(format-time-string "%Y%m%d.%H%M")
+#+end_src
+
+#+begin_src emacs-lisp :noweb yes
+;; To get more debug info about the packages getting loaded, add the following
+;; line before requiring Emacs-Leuven.
+;;
+;;     ;; Show messages describing progress of loading Emacs-Leuven.
+     (setq leuven-verbose-loading t)
+;;
+;; To avoid being questioned about packages to add to your local Emacs
+;; installation (though, I think you should install them), add the following
+;; line before requiring Emacs-Leuven.
+;;
+;;     ;; Do not (try to) install extra Emacs packages.
+     (setq package-selected-packages nil)
+;;
+;; To install all the extra packages used hereunder, without being questioned,
+;; add the following line before requiring Emacs-Leuven.
+;;
+;;     ;; Install all extra Emacs packages without asking for confirmation.
+     (setq leuven-install-all-missing-elpa-packages t)
+;;
+#+end_src
+
+* Code
+
+* Pre-init
+
+** Startup Time
+
+#+begin_src emacs-lisp
+;; Time the loading of Emacs Leuven.  Keep this on top of your .emacs.
+(defconst leuven--start-time (current-time)
+  "Value of `current-time' before loading the Emacs-Leuven library.")
+#+end_src
+
+** GNU Emacs Internals: Garbage Collection
+
+By default Emacs will initiate GC every 0.76 MB allocated (~gc-cons-threshold~ ==
+800,000 B).
+
+If you have a modern machine, I encourage you to add the following:
+
+#+begin_src emacs-lisp
+;; Increase the garbage collection threshold to speed up initialization.
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Reset the garbage collection threshold after initialization is complete.
+(add-hook 'after-init-hook
+          #'(lambda ()
+              ;; Perform a garbage collection.
+              (garbage-collect)
+              (message "Garbage collection completed.")
+
+              ;; Reset the garbage collection threshold to its default value.
+              (setq gc-cons-threshold
+                    (car (get 'gc-cons-threshold 'standard-value)))))
+
+;; Don't display messages at start and end of garbage collection (as it hides
+;; too many interesting messages).
+(setq garbage-collection-messages nil)
+#+end_src
+
+* Init
+
+#+begin_src emacs-lisp :noweb yes
+(defconst leuven--emacs-version "<<current-time()>>"
+  "Emacs-Leuven version (date of the last change).")
+
+(message "* --[ Loading Emacs-Leuven %s]--" leuven--emacs-version)
+#+end_src
+
+#+begin_src emacs-lisp
+(defmacro measure-time (message &rest body)
+  "Measure the time it takes to evaluate BODY."
+  `(let ((start (current-time)))
+     ,@body
+     (message "[__%s (in %.02f s)___________________________]"
+              ,message (float-time (time-since start)))))
+#+end_src
+
+#+begin_src emacs-lisp
+;;; User Customizable Internal Variables
+
+(defgroup leuven nil
+  "Set of Emacs customizations (better defaults)."
+  :group 'convenience
+  :group 'text)
+
+(defcustom leuven-verbose-loading nil
+  "If non-nil, means show messages describing progress of loading Emacs-Leuven."
+  :group 'emacs-leuven
+  :type 'integer)
+#+end_src
+
+#+begin_src emacs-lisp
+(when (and (string-match "GNU Emacs" (version))
+           leuven-verbose-loading)
+  (defadvice message (before leuven-when-was-that activate)
+    "Add time stamps to `message' output."
+    (ad-set-arg 0 (concat (format-time-string "[%Y-%m-%d %T.")
+                          (substring (format-time-string "%N") 0 3)
+                          (format-time-string "] ")
+                          (ad-get-arg 0)))))
+#+end_src
+
+#+begin_src emacs-lisp
+;; Allow quick include/exclude of setup parts -- DO NOT EDIT the DEFVAR!
+(defvar leuven-load-chapter-0-environment t) ; required
+(defvar leuven-load-chapter-0-loading-libraries t) ; required
+(defvar leuven-load-chapter-0-debugging t)
+(defvar leuven-load-chapter-48-packages t)
+(defvar leuven-load-chapter-1-screen t)
+(defvar leuven-load-chapter-6-exiting t)
+(defvar leuven-load-chapter-7-basic t)
+(defvar leuven-load-chapter-8-minibuffer t)
+(defvar leuven-load-chapter-10-help t)
+(defvar leuven-load-chapter-11-mark t)
+(defvar leuven-load-chapter-12-killing t)
+(defvar leuven-load-chapter-13-registers t)
+(defvar leuven-load-chapter-14-display t)
+(defvar leuven-load-chapter-15-search t)
+(defvar leuven-load-chapter-16-fixit t)
+(defvar leuven-load-chapter-17-keyboard-macros t)
+(defvar leuven-load-chapter-18-files t)
+(defvar leuven-load-chapter-19-buffers t)
+(defvar leuven-load-chapter-20-windows t)
+(defvar leuven-load-chapter-21-frames t)
+(defvar leuven-load-chapter-22-international t)
+(defvar leuven-load-chapter-23-major-and-minor-modes t)
+(defvar leuven-load-chapter-24-indentation t)
+(defvar leuven-load-chapter-25-text t)
+(defvar leuven-load-chapter-25.11-tex-mode t)
+(defvar leuven-load-chapter-26-programs t)
+(defvar leuven-load-chapter-27-building t)
+(defvar leuven-load-chapter-28-maintaining t)
+(defvar leuven-load-chapter-29-abbrevs t)
+(defvar leuven-load-chapter-30-dired t)
+(defvar leuven-load-chapter-31-calendar-diary t)
+(defvar leuven-load-chapter-32-sending-mail t)
+(defvar leuven-load-chapter-34-gnus t)
+(defvar leuven-load-chapter-36-document-view t)
+(defvar leuven-load-chapter-38-shell t)
+(defvar leuven-load-chapter-39-emacs-server t)
+(defvar leuven-load-chapter-40-printing t)
+(defvar leuven-load-chapter-41-sorting t)
+(defvar leuven-load-chapter-44-saving-emacs-sessions t)
+(defvar leuven-load-chapter-46-hyperlinking t)
+(defvar leuven-load-chapter-47-amusements t)
+(defvar leuven-load-chapter-49-customization t)
+(defvar leuven-load-chapter-AppG-ms-dos t)
+(defvar leuven-load-chapter-XX-emacs-display t)
+(defvar leuven-load-chapter-99-debugging t)
+#+end_src
+
+#+begin_src emacs-lisp
+(defvar leuven--load-times-list nil
+  "List of chapters and time to load them.")
+
+(defmacro leuven--chapter (chapterid chaptername &rest body)
+  "When CHAPTERID is not nil, report as CHAPTERNAME the evaluation of BODY.
+Save execution times in the global list `leuven--load-times-list'."
+  `(when ,chapterid
+     (let (before-chapter-time
+           this-chapter-time)
+       (when leuven-verbose-loading
+         (message "[** %s]" ,chaptername))
+       (setq before-chapter-time (float-time))
+       (setq leuven--before-section-time (float-time)) ; Init section time.
+       (progn ,@body)
+       (leuven--section (concat "[" ,chaptername " ends here]") 'end-of-chapter)
+                                        ; Add fake closing section.
+       (setq this-chapter-time
+             (format "%.2f" (- (float-time) before-chapter-time)))
+       (add-to-list 'leuven--load-times-list
+                    (concat "| " ,chaptername " "
+                            "| " this-chapter-time " |")))))
+
+(defvar leuven--before-section-time (float-time)
+  "Value of `float-time' before loading some section.")
+
+(defun leuven--section (sectionname &optional end-of-chapter)
+  "Report under SECTIONNAME the time taken since it was last saved.
+Last time is saved in global variable `leuven--before-section-time'."
+  (let ((this-section-time (- (float-time)
+                              leuven--before-section-time)))
+    (when leuven-verbose-loading
+      (when (not (equal this-section-time 0.00))
+        (message "[    Section time: %.2f s]" this-section-time))
+      (unless end-of-chapter (message "[*** %s]" sectionname)))
+    ;; For next one.
+    (setq leuven--before-section-time (float-time))))
+#+end_src
+

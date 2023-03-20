@@ -1,0 +1,71 @@
+* Emacs Lisp Packages
+:PROPERTIES:
+:ID:       8c71fa50-b62e-49ae-bcbb-2ed1ee7a5d65
+:END:
+
+Installed packages are now activated *before* loading the init file.
+-- https://github.com/emacs-mirror/emacs/blob/master/etc/NEWS.27
+
+** The Package Menu Buffer
+
+#+begin_src emacs-lisp
+;;* 48 Emacs Lisp (info "(emacs)Packages")
+
+(leuven--chapter leuven-load-chapter-48-packages "48 Emacs Lisp Packages"
+#+end_src
+
+To upgrade packages after running ~package-list-packages~, type:
+
+- ~U~ (/mark Upgradable packages/) and then
+- ~x~ (/eXecute the installs and deletions/).
+
+When it's done installing all the packages, you delete the obsolete packages by
+hitting ~y~ (/Yes/) when asked.
+
+** Package Installation
+
+The first time you start emacs, it will install some additional packages that
+are best handled by the package manager.
+
+- User's Emacs Lisp packages in ~package-user-dir~ (=~/.emacs.d/elpa=)
+- System-wide Emacs Lisp packages in ~package-directory-list~
+
+HTTP frontends for the Emacs repositories:
+- http://elpa.gnu.org/packages/
+- http://melpa.org/packages/
+
+In Marmalade, the developers themselves do the packaging.  In MELPA, packages
+are generated programmatically from upstream Git-based sources.
+
+#+begin_note
+The Marmalade repository is not recommended by Flycheck (due to frequent
+outages).
+#+end_note
+
+To list packages which should /not/ be installed by Emacs-Leuven, add something
+like this into your configuration file:
+
+#+begin_example
+(setq leuven-excluded-packages '(ess flycheck-ledger))
+#+end_example
+
+#+begin_src emacs-lisp
+;;** 48.2 Package Installation
+
+  (leuven--section "48.2 Package Installation")
+
+(require 'package)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+))
+(setq load-prefer-newer t)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+)                                       ; Chapter 48 ends here.
+#+end_src
+
