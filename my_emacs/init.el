@@ -28,6 +28,10 @@
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/014-Controlling-the-Display.org")
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/015-Searching-and-Replacement.org")
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/016-Commands-for-Fixing-Typos.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/017-Keyboard-Macros.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/018-Files-Handling.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/019-Using-Multiple-Buffers.org")
+(org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/020-Multiple-Windows.org")
 
 (org-babel-load-file "/home/ivanir/my_config/my_emacs/lisp/049-Customization.org")
 

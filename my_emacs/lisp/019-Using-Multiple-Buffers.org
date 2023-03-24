@@ -1,0 +1,149 @@
+* Using Multiple Buffers
+
+#+begin_src emacs-lisp
+;;* 19 Using Multiple (info "(emacs)Buffers")
+
+(leuven--chapter leuven-load-chapter-19-buffers "19 Using Multiple Buffers"
+#+end_src
+
+** Listing Existing Buffers
+
+- The ~C~ (current) column has a ~.~ for the buffer from which you came.
+- The ~R~ (read-only) column has a ~%~ if the buffer is read-only.
+- The ~M~ (modified) column has a ~*~ if it is modified.
+
+#+begin_src emacs-lisp
+  ;;** 19.2 (info "(emacs)List Buffers")
+
+	(leuven--section "19.2 (emacs)List Buffers")
+
+	;; (unless (locate-library "helm-autoloads")
+
+	;;   ;; Operate on buffers like Dired.
+	;;   (global-set-key (kbd "C-x C-b") #'ibuffer))
+
+	(use-package "ibuffer"
+	  :config
+	  ;; Completely replaces `list-buffer'.
+	  (defalias 'ibuffer-list-buffers 'list-buffer)
+
+	  ;; Don't show the names of filter groups which are empty.
+	  (setq ibuffer-show-empty-filter-groups nil)
+
+	  ;; Filtering groups.
+	  (setq ibuffer-saved-filter-groups
+			'(("default"
+			   ("Chat"
+				(mode . circe-mode))
+			   ("Org"
+				(or (mode . diary-mode)
+					(mode . org-mode)
+					(mode . org-agenda-mode)))
+			   ("LaTeX"
+				(or (mode . latex-mode)
+					(mode . LaTeX-mode)
+					(mode . bibtex-mode)
+					(mode . reftex-mode)))
+			   ("Gnus & News"
+				(or (mode . message-mode)
+					(mode . bbdb-mode)
+					(mode . mail-mode)
+					(mode . gnus-group-mode)
+					(mode . gnus-summary-mode)
+					(mode . gnus-article-mode)
+					(name . "^\\(\\.bbdb\\|dot-bbdb\\)$")
+					(name . "^\\.newsrc-dribble$")
+					(mode . newsticker-mode)))
+			   ("Files"
+				(filename . ".*"))
+			   ("Dired"
+				(mode . dired-mode))
+			   ("Shell"
+				(mode . shell-mode))
+			   ("Version Control"
+				(or (mode . svn-status-mode)
+					(mode . svn-log-edit-mode)
+					(name . "^\\*svn-")
+					(name . "^\\*vc\\*$")
+					(name . "^\\*Annotate")
+					(name . "^\\*git-")
+					(name . "^\\*vc-")))
+			   ("Emacs"
+				(or (name . "^\\*scratch\\*$")
+					(name . "^\\*Messages\\*$")
+					(name . "^TAGS\\(<[0-9]+>\\)?$")
+					(name . "^\\*Occur\\*$")
+					(name . "^\\*grep\\*$")
+					(name . "^\\*Compile-Log\\*$")
+					(name . "^\\*Backtrace\\*$")
+					(name . "^\\*Process List\\*$")
+					(name . "^\\*gud\\*$")
+					(name . "^\\*Kill Ring\\*$")
+					(name . "^\\*Completions\\*$")
+					(name . "^\\*tramp")
+					(name . "^\\*compilation\\*$")))
+			   ("Emacs Source"
+				(mode . emacs-lisp-mode))
+			   ("Documentation"
+				(or (mode . Info-mode)
+					(mode . apropos-mode)
+					(mode . woman-mode)
+					(mode . help-mode)
+					(mode . Man-mode))))))
+
+	  (add-hook 'ibuffer-mode-hook
+				#'(lambda ()
+					(ibuffer-switch-to-saved-filter-groups "default")))
+
+	  ;; Order the groups so the order is: [Default], [agenda], [emacs].
+	  (defadvice ibuffer-generate-filter-groups
+		(after leuven-reverse-ibuffer-groups activate)
+		(setq ad-return-value (nreverse ad-return-value))))
+#+end_src
+
+** Killing Buffers
+
+#+begin_src emacs-lisp
+;;** 19.4 (info "(emacs)Kill Buffer")
+
+  (leuven--section "19.4 (emacs)Kill Buffer")
+
+  ;; Kill this buffer without confirmation (if not modified).
+  (defun leuven-kill-this-buffer-without-query ()
+    "Kill the current buffer without confirmation (if not modified)."
+    (interactive)
+    (kill-buffer nil))
+
+  ;; Key binding.
+  (global-set-key (kbd "<S-f12>") #'leuven-kill-this-buffer-without-query)
+#+end_src
+
+** Operating on Several Buffers
+
+#+begin_src emacs-lisp
+;;** 19.5 (info "(emacs)Several Buffers")
+
+  (leuven--section "19.5 (emacs)Several Buffers")
+
+  ;; Put the current buffer at the end of the list of all buffers.
+  (global-set-key (kbd "<M-f12>") #'bury-buffer)
+#+end_src
+
+** Convenience Features and Customization of Buffer Handling
+
+#+begin_src emacs-lisp
+  ;;** 19.7 (info "(emacs)Buffer Convenience") and Customization of Buffer Handling
+
+	(leuven--section "19.7 (emacs)Buffer Convenience and Customization of Buffer Handling")
+
+	(use-package uniquify
+          :ensure nil
+	  :config
+	  ;; Distinguish directories by adding extra separator.
+	  (setq uniquify-trailing-separator-p t))
+#+end_src
+
+#+begin_src emacs-lisp
+)                                       ; Chapter 19 ends here.
+#+end_src
+

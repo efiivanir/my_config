@@ -94,7 +94,18 @@ If not, just print a message."
       `(eval-after-load ,mode
          '(progn ,@body))))
 #+end_src
+** Function to print the load-path line by line
+#+begin_src emacs-lisp
+  (defun ivanir-print-load-path ()
+	"Print load-path line by line"
+	(interactive)
+	(setq a load-path)
+	(while a
+	  (print (car a))
+	  (setq a (cdr a)))
+	)
 
+#+end_src
 ** Creating and selecting buffers
 
 #+begin_src emacs-lisp

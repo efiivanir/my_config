@@ -1,0 +1,81 @@
+* Keyboard Macros
+
+#+begin_src emacs-lisp
+;;* 17 (info "(emacs)Keyboard Macros")
+
+(leuven--chapter leuven-load-chapter-17-keyboard-macros "17 Keyboard Macros"
+#+end_src
+
+Shows keyboard macros or latest interactive commands as Emacs Lisp:
+https://github.com/Silex/elmacro.
+
+** Basic Use
+
+- ~S-<F8>~ ::
+     Start recording your keyboard macro.
+
+- ~S-<F8>~ again ::
+     Stop recording it.
+
+- ~<F8>~ ::
+     Call the keyboard macro.
+
+If you want to check the result each time before repeating, type ~<F8> e e...~.
+
+If you want to repeat only N times, type ~C-u N <F8>~.
+
+If you want to repeat forever or until error, type ~C-u 0 <F8>~.
+
+#+begin_src emacs-lisp
+;;** 17.1 (info "(emacs)Basic Keyboard Macro") Use
+
+  (leuven--section "17.1 (emacs)Basic Keyboard Macro Use")
+
+  (defun leuven-kmacro-turn-on-recording ()
+    "Start recording a keyboard macro and toggle functionality of key binding."
+    (interactive)
+    (global-set-key (kbd "<S-f8>") #'leuven-kmacro-turn-off-recording)
+    (kmacro-start-macro nil))
+
+  (defun leuven-kmacro-turn-off-recording ()
+    "Stop recording a keyboard macro and toggle functionality of key binding."
+    (interactive)
+    (global-set-key (kbd "<S-f8>") #'leuven-kmacro-turn-on-recording)
+    (kmacro-end-macro nil))
+
+  ;; Start/stop recording a keyboard macro.
+  (global-set-key (kbd "<S-f8>") #'leuven-kmacro-turn-on-recording)
+
+  ;; Execute the most recent keyboard macro.
+  (global-set-key (kbd "<f8>") #'kmacro-call-macro)
+#+end_src
+
+** Naming and Saving Keyboard Macros
+
+- ~C-<F8>~ ::
+     Give the keyboard macro a name (to invoke it under that name).
+
+Assign the last macro to a free key binding of your choice with
+~kmacro-bind-to-key~ (bound to ~C-x C-k b~).
+
+To *save a named keyboard macro* (with its key binding) for future use, switch to
+your =.emacs= file, and run ~C-u M-x insert-kbd-macro~ (if you leave out the ~C-u~,
+then it will just insert the macro definition without the ~global-set-key~
+sequence).
+
+You can add ~(interactive)~ to make it a command, so that you can use it with
+~M-x~.
+
+#+begin_src emacs-lisp
+;;** 17.5 Name and (info "(emacs)Save Keyboard Macro")s
+
+  (leuven--section "17.5 (emacs)Name and Save Keyboard Macros")
+
+  ;; Assign a name to the last keyboard macro defined.
+  (global-set-key (kbd "<C-f8>") #'kmacro-name-last-macro)
+#+end_src
+
+#+begin_src emacs-lisp
+)                                       ; Chapter 17 ends here.
+#+end_src
+
