@@ -1,0 +1,81 @@
+* Major and Minor Modes
+
+#+begin_src emacs-lisp
+;;* 23 (info "(emacs)Modes")
+
+(leuven--chapter leuven-load-chapter-23-major-and-minor-modes "23 Major and Minor Modes"
+#+end_src
+
+** How Major Modes are Chosen
+
+See "Syntax of Regexps":
+- ~\'~ matches end of string
+- ~$~ matches end of line
+
+#+begin_src emacs-lisp
+;;** 23.3 (info "(emacs)Choosing Modes")
+
+  (leuven--section "23.3 (emacs)Choosing File Modes")
+#+end_src
+
+*** Choice based on the file name
+
+Instead of superseding the binding in ~auto-mode-alist~, you can replace it
+(brute force) with ~(setcdr (rassq 'old-mode auto-mode-alist) 'new-mode)~.
+
+#+begin_src emacs-lisp
+  ;; List of filename patterns.
+  (setq auto-mode-alist
+		(append '(("\\.log\\'"       . text-mode)
+				  ;; ("\\.[tT]e[xX]\\'" . latex-mode)
+				  ;; ("\\.cls\\'"       . LaTeX-mode)
+				  ("\\.cgi\\'"       . perl-mode)
+				  ;; ("[mM]akefile"     . makefile-mode)
+				  (".ssh/config\\'"  . ssh-config-mode)
+				  ("sshd?_config\\'" . ssh-config-mode)
+				  ) auto-mode-alist))
+
+  ;; Major mode for fontifiying ssh config files.
+ ; (use-package ssh-config-mode
+ ;	:load-path "site-lisp"
+	;; :config
+  ;;   (autoload 'ssh-config-mode "ssh-config-mode" t)
+  ;;   (add-to-list 'auto-mode-alist '("/\\.ssh/config\\(\\.d/.*\\.conf\\)?\\'" . ssh-config-mode))
+  ;;   (add-to-list 'auto-mode-alist '("/sshd?_config\\(\\.d/.*\\.conf\\)?\\'"  . ssh-config-mode))
+  ;;   (add-to-list 'auto-mode-alist '("/known_hosts\\'"       . ssh-known-hosts-mode))
+  ;;   (add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-authorized-keys-mode))
+  ;;   (add-hook 'ssh-config-mode-hook 'turn-on-font-lock)
+  ;)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Major mode for editing comma-separated value files.
+  (use-package csv-mode
+	:ensure nil
+	:config
+	(add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+	;; Field separators: a list of *single-character* strings.
+	(setq csv-separators '("," ";"))
+  )
+#+end_src
+
+*** Choice based on the interpreter name
+
+#+begin_src emacs-lisp
+  ;; List of interpreters specified in the first line (starts with `#!').
+  (push '("expect" . tcl-mode) interpreter-mode-alist)
+#+end_src
+
+*** Choice based on the text at the start of the buffer
+
+For a list of buffer beginnings, see ~magic-mode-alist~.
+
+#+begin_src emacs-lisp
+  ;; ;; Load generic modes which support e.g. batch files.
+  ;; (try-require 'generic-x)
+#+end_src
+
+#+begin_src emacs-lisp
+)                                       ; Chapter 23 ends here.
+#+end_src
+

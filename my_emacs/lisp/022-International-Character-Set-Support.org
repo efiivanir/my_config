@@ -1,0 +1,255 @@
+* International Character Set Support
+
+#+begin_src emacs-lisp
+;;* 22 (info "(emacs)International") Character Set Support
+
+(leuven--chapter leuven-load-chapter-22-international "22 International Character Set Support"
+#+end_src
+
+For any user who needs symbols that are not in the 7-bit ASCII set, our
+recommendation is to move to Unicode UTF-8.  That is the only encoding that is
+the same across all platforms and operating systems that support it.
+
+To check your locale settings, you can have a look to what Emacs produce (in a
+mail buffer) under "Important settings" when you type
+~M-x report-emacs-bug RET foo RET~:
+
+*Important settings*:
+- value of ~$LC_ALL~: ~nil~
+- value of ~$LC_COLLATE~: ~nil~
+- value of ~$LC_CTYPE~: ~nil~
+- value of ~$LC_MESSAGES~: ~nil~
+- value of ~$LC_MONETARY~: ~nil~
+- value of ~$LC_NUMERIC~: ~nil~
+- value of ~$LC_TIME~: ~nil~
+- value of ~$LANG~: ~en_US.UTF-8~
+- value of ~$XMODIFIERS~: ~nil~
+- ~locale-coding-system~: ~utf-8-unix~
+- ~default-enable-multibyte-characters~: ~t~
+
+#+begin_note
+If ~LANG~ is set, that's enough: all the ~LC_*~ default to whatever ~LANG~ says, but
+you can override them if you set them explicitly.
+#+end_note
+
+** Introduction to International Character Sets
+
+#+begin_tip
+To open (or save) a file in UTF-8, you can press ~C-x RET c utf-8 RET~
+(~universal-coding-system-argument~) before the ~C-x C-f~ (or ~C-x C-s~).
+#+end_tip
+
+To help you find all the chars you need to replace by escape sequences, you can
+use ~C-u C-s [^[:ascii:]]~.
+
+~M-x describe-coding-system RET RET~
+
+To see all the non-ASCII characters you can type with the ~C-x 8~ prefix, type
+~C-x 8 C-h~.
+
+#+begin_src emacs-lisp
+  ;;** 22.1 (info "(emacs)International Chars")
+
+	(leuven--section "22.1 (emacs)International Chars")
+
+	;; Keyboard input definitions for ISO 8859-1.
+	(use-package iso-transl
+	  :load-path "site-lisp"
+	  :config
+	  ;; Add binding for "zero width space".
+	  (define-key iso-transl-ctl-x-8-map (kbd "0") [?​]))
+#+end_src
+
+** Language Environments
+
+#+begin_src emacs-lisp
+;;** 22.2 (info "(emacs)Language Environments")
+
+  (leuven--section "22.2 (emacs)Language Environments")
+
+  ;; Specify your character-set locale.
+  (setenv "LANG" "en_US.utf8")          ; For `svn' not to report warnings.
+
+  ;; System locale to use for formatting time values.
+  (setq system-time-locale "C")         ; Make sure that the weekdays in the
+                                        ; time stamps of your Org mode files and
+                                        ; in the agenda appear in English.
+
+  ;; (setq system-time-locale (getenv "LANG"))
+                                        ; For weekdays in your locale settings.
+#+end_src
+
+One could use:
+- ~LC_ALL~,
+- ~LC_COLLATE=C~ (or ~LC_COLLATE=POSIX~),
+- ~LC_CTYPE~,
+- ~LC_ALL~ or
+- ~LANG~
+
+but this won't work for a Windows binary (well for the Cygwin version) of Emacs.
+
+** Input Methods
+
+#+begin_src emacs-lisp
+;;** 22.3 (info "(emacs)Input Methods")
+
+  (leuven--section "22.3 (emacs)Input Methods")
+
+  ;; Get 8-bit characters in terminal mode (Cygwin Emacs).
+  (set-input-mode (car (current-input-mode))
+                  (nth 1 (current-input-mode))
+                  0)
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun leuven-list-unicode-display (&optional regexp)
+    "Display a list of unicode characters and their names in a buffer."
+    (interactive "sRegexp (default \".*\"): ")
+    (let* ((regexp (or regexp ".*"))
+           (case-fold-search t)
+           (cmp #'(lambda (x y) (< (cdr x) (cdr y))))
+           ;; alist like ("name" . code-point).
+           (char-alist (sort (cl-remove-if-not #'(lambda (x) (string-match regexp (car x)))
+                                               (ucs-names))
+                             cmp)))
+      (with-help-window "*Unicode characters*"
+        (with-current-buffer standard-output
+          (dolist (c char-alist)
+            (insert (format "0x%06X\t" (cdr c)))
+            (insert (cdr c))
+            (insert (format "\t%s\n" (car c))))))))
+#+end_src
+
+** Recognizing Coding Systems
+
+In GNU Emacs, when you specify the coding explicitly in the file via an explicit
+~coding:~ cookie, that overrides ~file-coding-system-alist~.
+
+XXX Declare PDF files as binary
+
+#+begin_note
+*ISO-8859-1* (also called Latin-1) is *identical to Windows-1252* (also called
+CP1252) *except for the code points 128-159* (0x80-0x9F). ISO-8859-1 assigns
+several control codes in this range. Windows-1252 has several characters,
+punctuation, arithmetic and business symbols assigned to these code points.
+https://www.i18nqa.com/debug/table-iso8859-1-vs-windows-1252.html#compare
+#+end_note
+
+#+begin_src emacs-lisp
+;;** 22.6 (info "(emacs)Recognize Coding") Systems
+
+  (leuven--section "22.6 (emacs)Recognize Coding Systems")
+
+  ;; Default coding system (for new files), also moved to the front of the
+  ;; priority list for automatic detection.
+  (prefer-coding-system 'utf-8-unix)    ; Unix flavor for code blocks executed
+                                        ; via Org-Babel.
+#+end_src
+
+#+begin_src emacs-lisp
+;; https://lists.gnu.org/archive/html/gnu-emacs-sources/2005-12/msg00005.html
+(defun leuven--do-accent (subst-list)
+  "Utility cleanup function."
+  (dolist (pair subst-list)
+    (save-excursion
+      (while (re-search-forward (car pair) nil t)
+        (replace-match (cdr pair) t)))))
+
+(defun leuven-cleanup-accent-iso-latin-1-to-utf-8 ()
+  "Replace non-UTF-8 characters."
+  (interactive)
+  ;; See https://www.fileformat.info/info/charset/UTF-8/list.htm, then type
+  ;; C-x 8 RET and then the number, followed by RET.
+  (leuven--do-accent '(("\200" . "EUR")  ;; \342\202\254
+                       ("\205" . "...")
+                       ("\221" . "`")
+                       ("\222" . "'")    ;; \342\200\231
+                       ("\223" . "\"")
+                       ("\224" . "\"")
+                       ("\226" . "-")
+                       ("\227" . "--")
+                       ("\234" . "oe")
+                       ("\240" . " ")    ;; \302\240
+                       ("\246" . "|")
+                       ("\251" . "©")
+                       ("\253" . "«")
+                       ("\256" . "®")
+                       ("\260" . "°")
+                       ("\265" . "u")
+                       ("\272" . "°")
+                       ("\273" . "»")
+                       ("\274" . "1/4")
+                       ("\275" . "1/2")
+                       ("\276" . "3/4")
+                       ("\277" . "¿")
+                       ("\300" . "À")
+                       ;; ("\301" . "") ;; caps spanish a ("facil")
+                       ("\302" . "Â")
+                       ("\304" . "Ä")
+                       ("\307" . "Ç")
+                       ("\310" . "È")
+                       ("\311" . "É")
+                       ("\312" . "Ê")
+                       ("\316" . "Î")
+                       ("\317" . "Ï")
+                       ("\324" . "Ô")
+                       ("\326" . "Ö")
+                       ("\331" . "Ù")
+                       ("\337" . "ss")
+                       ("\333" . "Û")
+                       ("\334" . "Ü")
+                       ("\340" . "à")    ;; \303\240
+                       ("\341" . "á")    ;; \303\241
+                       ("\342" . "â")    ;; \303\242
+                       ("\344" . "ä")
+                       ("\347" . "ç")
+                       ("\350" . "è")    ;; \303\250
+                       ("\351" . "é")    ;; \303\251
+                       ("\352" . "ê")
+                       ("\353" . "ë")
+                       ("\355" . "í")
+                       ("\356" . "î")
+                       ("\357" . "ï")
+                       ("\361" . "ñ")
+                       ("\363" . "ó")    ;; \303\263
+                       ("\364" . "ô")    ;; \303\264
+                       ("\365" . "õ")
+                       ("\366" . "ö")
+                       ("\371" . "ù")
+                       ("\372" . "ú")
+                       ("\373" . "û")    ;; \303\273
+                       ("\374" . "ü")    ;; \303\274
+                       )))
+#+end_src
+
+** Specifying a File's Coding System
+
+#+begin_src emacs-lisp
+;;** 22.7 (info "(emacs)Specify Coding") System of a File
+
+  (leuven--section "22.7 (emacs)Specify Coding System of a File")
+
+  ;; To copy and paste to and from Emacs through the clipboard (with coding
+  ;; system conversion).
+  (cond (leuven--win32-p
+         (set-selection-coding-system 'compound-text-with-extensions))
+        (t
+         (set-selection-coding-system 'utf-8)))
+#+end_src
+
+** Bidirectional Editing
+
+#+begin_src emacs-lisp :tangle no
+;;** 22.19 (info "(emacs)Bidirectional Editing")
+
+  (leuven--section "22.19 (emacs)Bidirectional Editing")
+
+  ;; Faster scrolling (if you never expect to have to display bidirectional
+  ;; scripts, such as Arabic and Hebrew).
+  (setq-default bidi-paragraph-direction 'left-to-right)
+#+end_src
+
+#+begin_src emacs-lisp
+)                                       ; Chapter 22 ends here.
+#+end_src
+

@@ -1,0 +1,1688 @@
+* Editing Programs
+
+#+begin_src emacs-lisp
+;;* 26 Editing (info "(emacs)Programs")
+
+(leuven--chapter leuven-load-chapter-26-programs "26 Editing Programs"
+#+end_src
+
+Keyboard shortcuts:
+
+| Command          | Emacs    | Sublime Text | IntelliJ IDEA | TextMate | Atom   | Webstorm |
+|------------------+----------+--------------+---------------+----------+--------+----------|
+| Move line up     | C-S-up   | C-S-up       | M-S-up        |          | C-up   | M-S-up   |
+| Move line down   | C-S-down | C-S-down     | M-S-down      |          | C-down | M-S-down |
+| Scroll line up   | C-up     |              |               |          |        |          |
+| Scroll line down | C-down   |              |               |          |        |          |
+
+#+begin_src emacs-lisp
+  ;; Swap the current and next line.
+  (defun leuven-move-line-down ()
+    "Move the current line down one line."
+    (interactive)
+    (forward-line 1)
+    (transpose-lines 1)
+    (forward-line -1))
+
+  ;; Swap the current and previous line.
+  (defun leuven-move-line-up ()
+    "Move the current line up one line."
+    (interactive)
+    (transpose-lines 1)
+    (forward-line -2))
+
+  (add-hook 'prog-mode-hook
+            #'(lambda ()
+                (local-set-key (kbd "<C-S-down>") #'leuven-move-line-down)
+                (local-set-key (kbd "<C-S-up>")   #'leuven-move-line-up)
+                                        ; Sublime Text and js2-refactor.
+                (local-set-key (kbd "<M-S-down>") #'leuven-move-line-down)
+                (local-set-key (kbd "<M-S-up>")   #'leuven-move-line-up)))
+                                        ; IntelliJ IDEA.
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Move caret down and up in the editor.
+  (add-hook 'prog-mode-hook
+            #'(lambda ()
+                ;; Scroll text of current window upward by one line.
+                (local-set-key (kbd "<C-up>")   (kbd "C-u 1 C-v"))
+
+                ;; Scroll text of current window downward by one line.
+                (local-set-key (kbd "<C-down>") (kbd "C-u 1 M-v"))))
+                                        ; Sublime Text + SQL Management Studio + IntelliJ IDEA.
+#+end_src
+
+*************** TODO Add "move view" up/down on C-up/down
+See an example in SQL Server Management Studio
+*************** END
+
+** Major Modes for Programming Languages
+
+Have a look at:
+- [[http://cedet.sourceforge.net][CEDET]] for development in AWK, C/C++, C#, Calc, Erlang, Java, JavaScript, Make,
+  PHP, Python, Ruby and Scheme,
+- [[http://common-lisp.net/project/slime][SLIME]] for Common Lisp development,
+- JDEE for Java programs.
+
+Emacs tool for Emacs Lisp code analysis (to keep overview of the function calls
+and dependecies between functions/variables): byte-compile-generate-call-tree
+
+Also =who-calls.el=
+
+#+begin_src emacs-lisp
+;;** 26.1 Major Modes for (info "(emacs)Program Modes")
+
+  (leuven--section "26.1 Major Modes for (emacs)Program Modes")
+#+end_src
+
+** Top-Level Definitions, or Defuns
+:PROPERTIES:
+:ID:       ea687cd8-fff0-461f-999e-c9fbc84b5901
+:END:
+
+#+begin_src emacs-lisp
+;;** 26.2 Top-Level Definitions, or (info "(emacs)Defuns")
+
+  (leuven--section "26.2 Top-Level Definitions, or (emacs)Defuns")
+#+end_src
+
+*** Navigating Between Methods
+
+Keyboard shortcuts:
+
+| Command                      | Emacs | Leuven | IntelliJ IDEA |
+|------------------------------+-------+--------+---------------|
+| Move beginning of defun      | C-M-a | M-up   | M-up          |
+| Move end of defun            | C-M-e |        |               |
+| Move beginning of next defun |       | M-down | M-down        |
+
+Use ~M-up~ and ~M-down~ keys to quickly jump to the *previous* or *next function*.
+
+#+begin_src emacs-lisp
+  (defun leuven-beginning-of-next-defun ()
+    "Move forward to the beginning of next defun."
+    (interactive)
+    (let ((current-prefix-arg -1))
+      (call-interactively 'beginning-of-defun)))
+
+  ;; Next Method.
+  (global-set-key (kbd "<M-down>") #'leuven-beginning-of-next-defun)
+
+  ;; Previous Method.
+  (global-set-key (kbd "<M-up>")   #'beginning-of-defun) ; C-M-a.
+#+end_src
+
+Imenu is a great tool allowing you to *go to a function definition* (by name), but
+only if the definition is *in the buffer you are currently editing* (it won't jump
+and open another file).
+
+~font-lock-mode-hook~ is run after entering a major mode. You can make use of this
+to add an Imenu index to the menu bar in any mode that supports Imenu.
+
+#+begin_src emacs-lisp
+  ;; Making buffer indexes as menus.
+                   ; Awesome!
+  (use-package imenu
+    :config
+    ;; Imenu should always rescan the buffers.
+    (setq imenu-auto-rescan t)
+
+    ;; Add Imenu to the menu bar in any mode that supports it.
+    (defun try-to-add-imenu ()
+      (condition-case nil
+          (imenu-add-to-menubar "Outline") ; Imenu index.
+        (error nil)))
+    (add-hook 'font-lock-mode-hook #'try-to-add-imenu)
+
+    ;; Bind Imenu from the mouse.
+    (global-set-key [S-mouse-3] #'imenu)
+#+end_src
+
+#+begin_src emacs-lisp
+    ;; String to display in the mode line when current function is unknown.
+    (setq which-func-unknown "(Top Level)")
+
+    ;; Show current function in mode line (based on Imenu).
+    (which-function-mode 1)             ; ~ Stickyfunc mode (in header line)
+#+end_src
+
+Truncate the current function name (for the mode line):
+
+#+begin_src emacs-lisp
+    (defun leuven--which-func-current ()
+      (let ((current (gethash (selected-window) which-func-table)))
+        (if current
+            (truncate-string-to-width current 30 nil nil "...") ; 30 = OK!
+          which-func-unknown)))
+
+    (setq which-func-format
+          `("[" (:propertize (:eval (leuven--which-func-current))
+                             local-map ,which-func-keymap
+                             face which-func
+                             mouse-face mode-line-highlight
+                             help-echo "mouse-1: go to beginning\n\
+mouse-2: toggle rest visibility\n\
+mouse-3: go to end") "]")))
+#+end_src
+
+~helm-imenu-in-all-buffers~ command pops an Helm interface with all the *Imenu tags*
+*across all buffers with the same mode as the current one*.
+
+#+begin_note
+In a sense, it is similar to ~etag~ selection, but works only for the /open/
+buffers -- you don't get thousands of symbols from ~etags~ to deal with.  And this
+is often more convenient as you don't have to explicitly build the ~etags~ table.
+#+end_note
+
+#+begin_src emacs-lisp
+  (use-package helm
+    :config
+    ;; Keybinding to quickly jump to a symbol in buffer.
+    (global-set-key [remap imenu] #'helm-imenu)
+    (setq helm-imenu-delimiter ": ")
+    (setq helm-imenu-execute-action-at-once-if-one nil)
+    ;; ;; Helm Imenu tag selection across all buffers (with the same mode).
+    ;; (global-set-key (kbd "C-c i") #'helm-imenu-in-all-buffers)
+  )
+#+end_src
+
+** Indentation for Programs
+
+Changing the "hanginess" of a brace and then reindenting, will not move the
+brace to a different line.  For this, you're better off getting an external
+program like GNU ~indent~, which will rearrange brace location, among other
+things.
+
+#+begin_src emacs-lisp
+    ;;** 26.3 (info "(emacs)Program Indent")ation
+
+        (leuven--section "26.3 (emacs)Program Indentation")
+
+        ;; Turn on auto-fill mode in Lisp modes.
+        (add-hook 'lisp-mode-hook #'auto-fill-mode)
+        (add-hook 'emacs-lisp-mode-hook #'auto-fill-mode)
+
+        ;; Auto-indentation: automatically jump to the "correct" column when the RET
+        ;; key is pressed while editing a program (act as if you pressed `C-j').
+        (add-hook 'prog-mode-hook
+                  #'(lambda ()
+                      (local-set-key (kbd "<RET>") #'newline-and-indent)
+                      (local-set-key (kbd "C-j") #'newline)))
+
+        ;; (defun back-to-indentation-or-beginning ()
+        ;;   (interactive)
+        ;;   (if (/= (point) (line-beginning-position))
+        ;;       (beginning-of-line)
+        ;;     (back-to-indentation)))
+        ;;
+        ;; (defun align-with-spaces (beg end)
+        ;;   "Align selected using only spaces for whitespace."
+        ;;   (interactive "r")
+        ;;   (let ((indent-tabs-mode nil))
+        ;;     (align beg end)))
+
+        (use-package "sh-script"
+          :config
+          ;; Use the SMIE code for navigation and indentation.
+          (setq sh-use-smie t)
+        )
+#+end_src
+
+** Commands for Editing with Parentheses
+
+#+begin_src emacs-lisp
+;;** 26.4 Commands for Editing with (info "(emacs)Parentheses")
+
+  (leuven--section "26.4 Commands for Editing with (emacs)Parentheses")
+
+  ;; Check for unbalanced parentheses in the current buffer.
+  (dolist (mode '(emacs-lisp clojure js2 js))
+    (add-hook (intern (format "%s-mode-hook" mode))
+              #'(lambda ()
+                  (add-hook 'after-save-hook 'check-parens nil t))))
+
+  ;; Move cursor to offscreen open-paren when close-paren is inserted.
+  (setq blink-matching-paren 'jump-offscreen) ; XXX Doesn't work when
+                                              ; `show-paren-mode' is enabled.
+
+  ;; Highlight matching paren.
+  (show-paren-mode 1)
+  (setq show-paren-style 'mixed)
+  (setq show-paren-ring-bell-on-mismatch t)
+
+(setq show-paren-when-point-inside-paren t)
+(setq show-paren-when-point-in-periphery t)
+#+end_src
+
+*** Rainbow Parentheses
+
+Automagically highlight matching parentheses in source code.
+
+#+begin_src emacs-lisp :tangle no
+   ;; Highlight nested parens, brackets, braces a different color at each depth.
+   (use-package rainbow-delimiters
+     :config
+     ;; Enable rainbow-delimiters in programming modes.
+     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+  )
+#+end_src
+
+To customize it, see
+http://yoo2080.wordpress.com/2013/12/21/small-rainbow-delimiters-tutorial/.
+
+*** Navigating to Parentheses
+
+#+begin_src emacs-lisp
+  ;; XXX Navigate to the code block start.
+  (global-set-key (kbd "C-)") #'forward-sexp)
+  (global-set-key (kbd "C-(") #'backward-sexp)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Jump to matching parenthesis.
+  (defun leuven-goto-matching-paren (arg)
+    "Go to the matching parenthesis, if on a parenthesis."
+    (interactive "p")
+    (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+          ((looking-at "\\s\)") (forward-char 1) (backward-list 1))))
+
+  (global-set-key (kbd "C-S-)") #'leuven-goto-matching-paren)
+  (global-set-key (kbd "C-°")   #'leuven-goto-matching-paren)
+#+end_src
+
+*** Matching Parentheses
+
+Balanced editing: inserting two matching parentheses at once, etc.
+
+- autopair
+
+#+begin_src emacs-lisp :tangle no
+    (use-package autopair
+      :config
+      ;; Attempts to wrap the selected region.
+      (setq autopair-autowrap t)
+
+      ;; Enable Autopair-Global mode.
+      (autopair-global-mode 1)
+    )
+#+end_src
+
+- ~electric-pair-mode~ (in Emacs, since 24.1)
+
+  Here's a quick summary (~|~ marks point):
+
+  + typing ~((((~ makes            ~((((|))))~
+  + typing ~))))~ afterwards makes ~(((())))|~
+  + if the buffer has too many closers, an opener before them will *not* autopair
+  + if the buffer has too many openers, a closer after them will *not* autoskip
+  + in a mixed parenthesis situation with ~[]~'s and ~()~'s, it tries to do
+    sensible things
+
+  As of Emacs 24.4, this mode is greatly improved and matches autopair.el in
+  functionality (also recommended by the autopair author).
+
+- *paredit* is (was?) the thing to use for Emacs Lisp!
+
+  Paredit-kill kills text until next paren or double quote!  Also exists now in
+  smartparens strict mode...
+
+#+begin_src emacs-lisp :tangle no
+      ;; Minor mode for editing parentheses.
+      (use-package paredit
+        :config
+        (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+        ;; Common Lisp editing extensions.
+        (use-package redshank    ; Requires `paredit'.
+          :config
+          (add-hook 'emacs-lisp-mode-hook #'redshank-mode)
+        )
+     )
+#+end_src
+
+  Use it in ELisp; use smartparens in other modes (NOT globally!)
+
+  Keep looking at the [[http://www.emacswiki.org/emacs/PareditCheatsheet][cheatsheet]] until you've got the hang of it.
+
+  [[http://danmidwood.com/content/2014/11/21/animated-paredit.html][The Animated Guide to Paredit]]
+
+- *smartparens*
+
+  Pair can be simple as parentheses or brackets, or can be programming tokens
+  such as ~if~ ... ~fi~ or ~if~ ... ~end~ in many languages (see face
+  ~sp-show-pair-match-face~).
+
+  If you get into any serious lisp coding, check out ~paredit~ -- it forces you to
+  always have balanced brackets in the file, thus avoiding a whole class of
+  silly but hard-to-spot mistakes on lines ending with and avalanche of ~)))))~.
+
+  If you are less into bondage & submission, ~smartparens.el~ is another option,
+  it *helps* to have balanced brackets without breaking your will ;-)
+
+  It is more about ease-of-coding than B&D.
+
+  #+begin_note
+  If we believe Xiao Hanyu, smartparens is the future, it is the ultimate
+  solution for paren pairs management in Emacs world.  It is flexible, uniform
+  and highly customizable.  It is also bundled with a comprehensive
+  documentation, besides a Wiki, you can also ~M-x sp-cheat-sheet~ to get live
+  examples, which, I think, is really a innovative feature.
+  #+end_note
+
+  *Bug 18785: Emacs hangs with Org mode when point is in LOGBOOK.*
+
+  - ~C-M-e~ (~sp-up-sexp~) ::
+       Move forward out of one level of parentheses.
+
+  - ~C-M-u~ (~sp-backward-up-sexp~) ::
+       Move backward out of one level of parentheses.
+
+  - ~C-M-<backspace>~ (~sp-splice-sexp-killing-backward~) ::
+       Unwrap the current list and kill all the expressions between start of
+       this list and the point.
+
+       This one's surpisingly useful for writing prose.
+
+  - ~C-S-<backspace>~ or ~M-R~ ? (~sp-splice-sexp-killing-around~) ::
+       Unwrap the current list and kill everything inside except next
+       expression.
+
+  - ~C-<right>~ (~sp-forward-slurp-sexp~) ::
+       Add sexp following the current list in it by moving the closing
+       delimiter.
+
+  - ~C-<left>~ (~sp-forward-barf-sexp~) ::
+       Remove the last sexp in the current list by moving the closing delimiter.
+
+#+begin_src emacs-lisp
+  ;; Automatic insertion, wrapping and paredit-like navigation with user defined
+  ;; pairs.
+  (with-eval-after-load "smartparens-autoloads-XXX"
+
+    ;; Default configuration for smartparens package.
+    (require 'smartparens-config)       ; Keybinding management, markdown-mode,
+                                        ; org-mode, (la)tex-mode, Lisp modes,
+                                        ; C++, PHP.
+    (global-set-key "\M-R" #'sp-splice-sexp-killing-around) ; `sp-raise-sexp'.
+
+    ;; Toggle Smartparens mode in all buffers.
+    (smartparens-global-mode 1)         ; How to disable this in large files?
+
+    ;; Toggle Show-Smartparens mode in all buffers.
+    (show-smartparens-global-mode 1)
+
+    ;; Remove local pairs in Text mode.
+    (sp-local-pair 'text-mode "'" nil :actions nil)
+    (sp-local-pair 'text-mode "\"" nil :actions nil)
+
+    (push 'latex-mode sp-ignore-modes-list)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+    (require 'smartparens-org)
+#+end_src
+
+  Combining the regular ~kill-line~ with ~sp-kill-sexp~: ~kill-line~ everywhere, and
+  ~sp-kill-sexp~ with a prefix.
+
+#+begin_src emacs-lisp
+    (defun leuven-sp-kill-maybe (arg)
+      (interactive "P")
+      (if (consp arg)
+          (sp-kill-sexp)
+        (kill-line arg)))
+
+    (global-set-key [remap kill-line] #'leuven-sp-kill-maybe)
+#+end_src
+
+  =turn-on-smartparens-strict-mode= adds years to one's life to allow for more
+  hacking.  Seriously.  XXX
+
+#+begin_src emacs-lisp :tangle no
+    ;; ;; Enable smartparens-strict-mode in all Lisp modes.
+    ;; (mapc #'(lambda (mode)
+    ;;         (add-hook (intern (format "%s-hook" (symbol-name mode)))
+    ;;                   #'smartparens-strict-mode))
+    ;;       sp--lisp-modes)
+#+end_src
+
+#+begin_src emacs-lisp
+    )
+#+end_src
+
+** Manipulating Comments
+
+#+begin_src emacs-lisp
+;;** 26.5 (info "(emacs)Comments")
+
+  (leuven--section "26.5 (emacs)Comments")
+
+  ;; Always comments out empty lines.
+  (setq comment-empty-lines t)
+
+  (unless (locate-library "smart-comment-autoloads-XXX")
+
+    (defadvice comment-dwim (around leuven-comment activate)
+      "When called interactively with no active region, comment a single line instead."
+      (if (or (use-region-p) (not (called-interactively-p 'any)))
+          ad-do-it
+        (comment-or-uncomment-region (line-beginning-position)
+                                     (line-end-position))
+        (message "[Commented line]"))))
+
+  (with-eval-after-load "smart-comment-autoloads-XXX"
+
+    (global-set-key (kbd "M-;") #'smart-comment))
+#+end_src
+
+** Documentation Lookup
+
+Function argument hint.  Highlight the arguments in
+~eldoc-highlight-function-argument~.
+
+#+begin_src emacs-lisp
+;;** 26.6 (info "(emacs)Documentation") Lookup
+
+  (leuven--section "26.6 (emacs)Documentation Lookup")
+
+  ;; Idle time to wait before printing documentation.
+  (setq eldoc-idle-delay 0.2)
+
+  ;; Resize echo area to fit documentation.
+  (setq eldoc-echo-area-use-multiline-p t)
+#+end_src
+
+New minor mode ~global-eldoc-mode~ is enabled by default in Emacs 25.
+
+#+begin_src emacs-lisp
+  ;; ;; Show the function arglist or the variable docstring in the echo area.
+  ;; (global-eldoc-mode)                 ; In Emacs 25.
+#+end_src
+
+** Hideshow minor mode (code folding)
+:PROPERTIES:
+:ID:       a36b1dbd-1d05-4ff2-b19a-167e50c4f1f7
+:END:
+
+XXX See http://stackoverflow.com/questions/2399612/why-is-there-no-code-folding-in-emacs
+
+Hideshow can *fold* and unfold (i.e. hide and un-hide) logical blocks of *code* in
+many programming modes.
+
+~hs-minor-mode.el~ collapses code for a lot of languages, not only Lisp.  See
+[[id:42ad895e-c049-4710-a877-5014a7f6acfc][outline-minor-mode]] as well.
+
+And the pretty awesome ~hideshow-org~.  Folding made useful.
+
+Keyboard shortcuts:
+
+| Command                         | Emacs | Sublime Text | Visual Studio | Webstorm |
+|---------------------------------+-------+--------------+---------------+----------|
+| Fold (collapse) region          |       | C-S-[        | C-S-[         | C--      |
+| Unfold (uncollapse) region      |       | C-S-]        | C-S-]         | C-+      |
+|---------------------------------+-------+--------------+---------------+----------|
+| Fold (collpase) All regions     |       |              | C-k C-0       | C-S--    |
+| Unfold (uncollapse) All regions |       | C-k C-j      |               | C-S-+    |
+|---------------------------------+-------+--------------+---------------+----------|
+| Fold (collapse) Tag Attributes  |       | C-k C-t      |               |          |
+
+#+begin_src emacs-lisp
+;;** 26.7 (info "(emacs)Hideshow") minor mode
+
+  (leuven--section "26.7 (emacs)Hideshow minor mode")
+
+  ;; Enable Hideshow (code folding) for programming modes.
+  (add-hook 'prog-mode-hook #'hs-minor-mode)
+
+  (with-eval-after-load "hideshow"
+
+    ;; Unhide both code and comment hidden blocks when doing incremental search.
+    (setq hs-isearch-open t)
+
+    (defadvice goto-line (after expand-after-goto-line activate compile)
+      (save-excursion (hs-show-block)))
+
+    (defadvice xref-find-definitions (after expand-after-xref-find-definitions activate compile)
+      (save-excursion (hs-show-block)))
+
+    ;; Change those really awkward key bindings with `@' in the middle.
+
+    ;; Folding / Expand block.
+    (define-key hs-minor-mode-map (kbd "<C-kp-add>")        #'hs-show-block)
+                                        ; `C-c @ C-s' (expand current fold)
+    ;; Folding / Collapse block.
+    (define-key hs-minor-mode-map (kbd "<C-kp-subtract>")   #'hs-hide-block)
+                                        ; `C-c @ C-h' (collapse current fold)
+    ;; Folding / Expand All.
+    (define-key hs-minor-mode-map (kbd "<C-S-kp-add>")      #'hs-show-all)
+                                        ; `C-c @ C-M-s' (expand all folds)
+    ;; Folding / Collapse All.
+    (define-key hs-minor-mode-map (kbd "<C-S-kp-subtract>") #'hs-hide-all)
+                                        ; `C-c @ C-M-h' (collapse all folds)
+
+    (defcustom hs-face 'hs-face
+      "*Specify the face to to use for the hidden region indicator"
+      :type 'face
+      :group 'hideshow)
+
+    (defface hs-face
+      '((t :box "#777777" :foreground "#9A9A6A" :background "#F3F349"))
+      "Face to hightlight the \"...\" area of hidden regions"
+      :group 'hideshow)
+
+    (defun hs-display-code-line-counts (ov)
+      (when (eq 'code (overlay-get ov 'hs))
+        (overlay-put ov 'display (propertize "..." 'face 'hs-face))))
+
+    (setq hs-set-up-overlay 'hs-display-code-line-counts)
+
+    ;; ;; Hide all top level blocks.
+    ;; (add-hook 'find-file-hook #'hs-hide-all)
+)
+#+end_src
+
+** Completion for Symbol Names
+:PROPERTIES:
+:ID:       4b262301-5370-40c6-8da6-019215634e20
+:END:
+
+#+begin_src emacs-lisp
+;;** 26.8 (info "(emacs)Symbol Completion")
+
+  (leuven--section "26.8 (emacs)Symbol Completion")
+#+end_src
+
+It's more or less a convention that each language mode binds its symbol
+completion command (~completion-at-point~) to ~<M-tab>~.
+
+#+begin_note
+If Semantic mode is enabled, it tries to use the *Semantic parser data* for
+completion.
+
+If Semantic mode is not enabled or fails at performing completion, it tries to
+complete using the *selected tags table*.
+
+If in Emacs Lisp mode, it performs completion using the function, variable, or
+property names defined in the current Emacs session.
+#+end_note
+
+Note that ~<M-tab>~ is used by many window managers themselves (typically for
+switching between windows) and is not passed to applications.
+
+In that case, you should:
+
+- type ~ESC TAB~ or ~C-M-i~ for completion, or
+
+- bind the command normally bound to ~<M-tab>~ to a key that is convenient for
+  you to hit, such as ~<C-tab>~.
+
+#+begin_src emacs-lisp :tangle no
+  ;; When you hit `<C-tab>', call the command normally bound to `<M-tab>'.
+  (global-set-key (kbd "<C-tab>")
+    #'(lambda ()
+        (interactive)
+        (call-interactively (key-binding (kbd "<M-tab>")))))
+#+end_src
+
+See also [[id:0fa23e4a-e42c-4317-834c-d2ef7c9d741c][Dabbrev]], Emacs' standard autocompletion (on by default).
+
+** Glasses minor mode
+
+Add overlays to use a different face for the capital letters in symbols like
+~CamelCaseUnreadableSymbol~, to make them easier to read.
+
+#+begin_src emacs-lisp
+;;** 26.9 (info "(emacs)Glasses") minor mode
+
+  (leuven--section "26.9 (emacs)Glasses minor mode")
+
+  (add-hook 'ess-mode-hook          #'glasses-mode)
+  (add-hook 'inferior-ess-mode-hook #'glasses-mode)
+  (add-hook 'java-mode-hook         #'glasses-mode)
+
+  (with-eval-after-load "glasses"
+
+    ;; String to be displayed as a visual separator in unreadable identifiers.
+    (setq glasses-separator "")
+
+    ;; No display change.
+    (setq glasses-original-separator "")
+
+    ;; Face to be put on capitals of an identifier looked through glasses.
+    (make-face 'leuven-glasses-face)
+    (set-face-attribute 'leuven-glasses-face nil :weight 'bold)
+    (setq glasses-face 'leuven-glasses-face)
+                                        ; Avoid the black foreground set in
+                                        ; `emacs-leuven-theme' to face `bold'.
+
+    ;; Set properties of glasses overlays.
+    (glasses-set-overlay-properties)
+
+    ;; No space between an identifier and an opening parenthesis.
+    (setq glasses-separate-parentheses-p nil))
+#+end_src
+
+subword-mode : M-f/M-b in ~CamelCaseUnreadableSymbol~.
+
+** C and related modes
+
+*** Eclim
+
+[[http://eclim.org/][Eclim]] provides the ability to *bring [[http://www.eclipse.org/][Eclipse]] code editing features* (to Vim, but
+also to other editors thanks to third party clients):
+
+- "true" *code completion* (i.e., only context-sensitive completions),
+- *code validation* (report any validation errors found),
+- searching for declarations or references, and
+- [[http://eclim.org/features.html][many more]].
+
+The initial goal was to provide Eclipse *Java* functionality, but support for
+various other languages (*C/C++*, HTML/CSS, Groovy, JavaScript, *PHP*, *Python*, *Ruby*,
+XML/DTD/XSD, etc.) has been added.
+
+See https://github.com/senny/emacs-eclim/issues/178.
+
+**** Download / install
+
+1. Install [[http://www.eclipse.org/downloads/][Eclipse]].
+2. Install [[http://eclim.org/install.html][Eclim]] (see ~vim.skip~ and ~vim.skip.hint~).
+3. Install [[https://github.com/senny/emacs-eclim][Emacs-eclim]] from MELPA.
+
+**** Getting started
+
+You should *create an Eclipse project first*, and then you can create a Java file
+and open it in Emacs.  Open plain Java file without creating an Eclipse project
+will not work.
+
+#+begin_note
+"Could not find eclipse project for <file>.java"?  Are you using *Cygwin Emacs*
+with a Windows Java installation?  ~/cygdrive~ paths won't be understood...
+#+end_note
+
+**** The Eclim daemon
+
+Eclimd (Eclim's daemon) can run without a graphical Eclipse, but you can also
+run it from plain Eclipse.  So whenever you need some eclipse's functionalities
+that aren't (yet) supported by either ~emacs-eclim~ or ~eclim~, you can switch to it
+(e.g. the debugger or the profiler).
+
+**** [[http://eclim.org/faq.html][FAQ / Troubleshooting]]
+
+To tell eclim *which Eclipse workspace to use*, you can start eclimd like so:
+
+#+begin_src shell :tangle no
+eclimd -Dosgi.instance.area.default=@user.home/another_workspace
+#+end_src
+
+**** Core functionality
+
+- ~M-x eclim-project-build~ ::
+     Triggers a *build* of *the current project*.
+
+- M-x eclim-run-class ::
+     *Run the current class*.
+
+- ~C-c C-e t~ (or ~M-x eclim-run-junit~) ::
+     *Run* the current *JUnit* class or method at point.
+
+Browsing:
+
+- C-c C-e h (M-x eclim-java-hierarchy) ::
+     Class hierarchy tree.
+
+- C-c C-e f t (M-x eclim-java-find-type) ::
+     Types.
+
+- ~C-c C-e f d~ (~M-x eclim-java-find-declaration~ or ~M-.~ in Emacs-Leuven) ::
+     *Find* and display the *declaration* of the *Java identifier at point*.
+
+- ~C-c C-e f r~ (~M-x eclim-java-find-references~) ::
+     *Find* and display *references* for the *Java identifier at point*
+     = list callers.
+     = Find Usages?
+
+Problems and Errors:
+
+- ~C-c C-e b~ (~M-x eclim-problems~) ::
+     *Show current compilation problems* in a separate window.
+
+- ~C-c C-e o~ (~M-x eclim-problems-open~) ::
+     Opens a new window inside the current frame showing the current project
+     *compilation problems*.
+
+Projects:
+
+- ~C-c C-e p c~ (~M-x eclim-project-create~) ::
+     Not documented.
+
+- ~M-x eclim-manage-projects~ ::
+     *Manage all your eclim projects* in one buffer.
+
+#+begin_src emacs-lisp
+  ;; An interface to the Eclipse IDE.
+  (with-eval-after-load "emacs-eclim-autoloads-XXX"
+
+    ;; Enable Eclim mode in Java.
+    (add-hook 'java-mode-hook #'eclim-mode))
+
+  (with-eval-after-load "eclim"
+
+    ;; Find Eclim installation.
+    (setq eclim-executable
+          (or (executable-find "eclim")
+              (concat leuven--windows-program-files-dir "eclipse/eclim.bat")))
+    ;; (setq eclim-executable "C:/PROGRA~2/eclipse/eclim.bat")
+    ;; (setq eclim-executable "C:/Users/Fabrice/Downloads/eclipse/eclim.bat")
+
+    ;; (add-to-list 'eclim-eclipse-dirs
+    ;;              (concat leuven--windows-program-files-dir "eclipse/eclim"))
+
+    ;; Print debug messages.
+    (setq eclim-print-debug-messages t)
+
+    ;; Add key binding.
+    (define-key eclim-mode-map (kbd "M-.") #'eclim-java-find-declaration)
+#+end_src
+
+#+begin_src emacs-lisp
+    ;; Display compilation error messages in the echo area.
+    (setq help-at-pt-display-when-idle t)
+    (setq help-at-pt-timer-delay 0.1)
+    (help-at-pt-set-timer)
+#+end_src
+
+#+begin_src emacs-lisp
+    ;; Add the emacs-eclim source.
+    (require 'ac-emacs-eclim-source)
+
+    ;;! Limit `ac-sources' to Eclim source.
+    (defun ac-emacs-eclim-java-setup ()
+      (setq ac-sources '(ac-source-emacs-eclim)))
+   ;; (setq ac-sources (delete 'ac-source-words-in-same-mode-buffers ac-sources))
+
+    (ac-emacs-eclim-config)
+#+end_src
+
+https://github.com/senny/emacs-eclim/wiki/Code-Completion
+
+#+begin_note
+There are 2 Eclim Company-mode backends:
+- ~company-eclim~, the built-in one.
+- ~company-emacs-eclim~, which is a bit more feature-rich (it uses YASnippet, for
+  instance), and also a bit buggier.
+#+end_note
+
+See http://java-coders.com/p/tsdh/emacs-eclim for Company.
+
+#+begin_src emacs-lisp
+    ;; Configure company-mode.
+    (require 'company-emacs-eclim)
+    (company-emacs-eclim-setup)
+#+end_src
+
+#+begin_src emacs-lisp
+    ;; Control the Eclim daemon from Emacs.
+    (require 'eclimd)
+
+    )
+#+end_src
+
+** Java
+
+** JavaScript
+
+*** JS2-mode
+
+The default *indentation* style for ~switch case~ is preferred and quite popular
+among JS developers.
+
+- Crockford's style also goes with this.
+  http://javascript.crockford.com/code.html
+
+- JavaScript
+  https://github.com/bengourley/js-style-guide (so it's not only Crockford)
+
+- Java
+  http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-142311.html#468
+
+Config examples:
+- https://github.com/cjohansen/.emacs.d/blob/98ddde2a17b1d0c6181891561bc01aaf570376ae/setup-js2-mode.el
+
+Vidéo:
+- [[https://www.youtube.com/watch?v=dbxoo-qEmcg][Some stuff you can do in Emacs in JavaScript]]
+
+Key bindings:
+
+- ~M-.~ (~js2-jump-to-definition~) ::
+     Jump to the definition of an object's property, variable or function.
+
+- M-, ::
+     Pop back to where ~M-x xref-find-definitions~ was last invoked.
+
+#+begin_src emacs-lisp
+  (with-eval-after-load "js2-mode-autoloads"
+
+    (add-to-list 'auto-mode-alist '("\\.js\\'\\|\\.json\\'" . js2-mode)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (with-eval-after-load "js2-mode"
+
+    ;; Add highlighting of many ECMA built-in functions.
+    (setq js2-highlight-level 3)
+
+    ;; Delay in secs before re-parsing after user makes changes.
+    (setq-default js2-idle-timer-delay 0.1)
+
+    ;; `js2-line-break' in mid-string will make it a string concatenation.
+    ;; The '+' will be inserted at the end of the line.
+    (setq js2-concat-multiline-strings 'eol)
+
+    ;; (setq js2-mode-show-parse-errors nil)
+
+    ;; Don't emit Ecma strict-mode warnings.
+    (setq js2-mode-show-strict-warnings nil)
+
+    ;; Let Flycheck handle parse errors.
+    (setq js2-strict-missing-semi-warning nil)
+
+    ;; ;; List of any extern names you'd like to consider always declared.
+    ;; (setq js2-global-externs '("View")) ; ARCHIBUS.
+
+    ;; Treat unused function arguments like declared-but-unused variables.
+    (setq js2-warn-about-unused-function-arguments t)
+
+    ;; Augment the default indent-line behavior with cycling among several
+    ;; computed alternatives.
+    (setq js2-bounce-indent-p t)
+#+end_src
+
+*** JS2-refactor
+
+The ~js2-refactor~ mode should start with ~C-c C-m~ (that is, ~C-c RET~) and then
+a two-letter mnemonic shortcut.
+
+List of available *refactorings*:
+
+- lt (log-this) ::
+     *Adds a console.log()* statement for what is at point (or region).
+
+- ~rv~ (~rename-var~) ::
+     *Renames* the *variable* on point and all occurrences in its lexical scope.
+
+- ~ev~ (~extract-var~) ::
+     Takes a *marked expression* and replaces it with a *var*.
+
+- ~ip~ (~introduce-parameter~) ::
+     Changes the *marked expression* to a *parameter* in a local function.
+
+- ~ef~ (~extract-function~) ::
+     *Extracts* the marked expressions out into a new named *function*.
+
+- ~em~ (~extract-method~) ::
+     *Extracts* the marked expressions out into a new named *method* in an object
+     literal.
+
+- ~vt~ (~var-to-this~) ::
+     Changes *local ~var* a~ to be ~this.a~ (*instance variable*) instead.
+
+- ~lp~ (~localize-parameter~) ::
+     Changes a parameter to a local var in a local function.
+
+- ~eo~ (~expand-object~) ::
+     Converts a one line object literal to multiline.
+
+- ~co~ (~contract-object~) ::
+     Converts a multiline object literal to one line.
+
+- ~eu~ (~expand-function~) ::
+     Converts a one line function to multiline (expecting semicolons as
+     statement delimiters).
+
+- ~cu~ (~contract-function~) ::
+     Converts a multiline function to one line (expecting semicolons as
+     statement delimiters).
+
+- ~ea~ (~expand-array~) ::
+     Converts a one line array to multiline.
+
+- ~ca~ (~contract-array~) ::
+     Converts a multiline array to one line.
+
+- ~wi~ (~wrap-buffer-in-iife~) ::
+     Wraps the entire buffer in an immediately invoked function expression.
+
+- ~ig~ (~inject-global-in-iife~) ::
+     Creates a shortcut for a marked global by injecting it in the wrapping
+     immediately invoked function expression.
+
+- ~ag~ (~add-to-globals-annotation~) ::
+     Creates a ~/*global */~ annotation if it is missing, and adds the var at
+     point to it.
+
+- ~iv~ (~inline-var~) ::
+     Replaces all instances of a variable with its initial value.
+
+- ~ao~ (~arguments-to-object~) ::
+     Replaces arguments to a function call with an object literal of named
+     arguments.  Requires YASnippet.
+
+- ~3i~ (~ternary-to-if~) ::
+     Converts ternary operator to if-statement.
+
+- ~sv~ (~split-var-declaration~) ::
+     Splits a ~var~ with multiple vars declared, into several ~var~ statements.
+
+- ~uw~ (~unwrap~) ::
+     Replaces the parent statement with the selected region.
+
+#+begin_src emacs-lisp
+  (with-eval-after-load "js2-refactor-autoloads"
+    (add-hook 'js2-mode-hook #'js2-refactor-mode)
+
+    (js2r-add-keybindings-with-prefix "C-c C-m") ; eg. extract variable with
+                                                 ; `C-c C-m ev`.
+    )
+)
+#+end_src
+
+*** Xref-js2
+
+#+begin_src emacs-lisp
+;; Xref-js2
+#+end_src
+
+*** Imenu
+
+http://emacs.stackexchange.com/questions/2658/how-to-display-the-list-of-functions-in-imenu-and-collapse-uncollapse-functions
+NOTE -- Solution 2 refers to (better) outlining support!!
+
+See ARCHIBUS Controller spec at
+http://www.archibus.com/ai/abizfiles/v19.2_help/system-management/Content/wc_views/Adv_Views_Techniques/using_js_to_extend_views/Basic_controller_programming.htm.
+
+#+begin_src emacs-lisp
+  ;; Below regex list could be used in both js-mode and js2-mode.
+  (setq javascript-common-imenu-regex-list
+        ;; Items are in reverse order because they are rendered in reverse.
+        `(("Function"                        "^[ \t]*\\([a-zA-Z0-9_$.]+\\)[ \t]*:[ \t]*function[ \t]*(" 1)
+
+          ("Auto-Wiring Panel Event _after"  "^[ \t]*.*_after\\([a-zA-Z0-9_$.]+\\)[ \t]*:[ \t]*function[ \t]*(" 1)
+          ("Auto-Wiring Panel Event _on"     "^[ \t]*.*_on\\([a-zA-Z0-9_$.]+\\)[ \t]*:[ \t]*function[ \t]*(" 1)
+          ("Auto-Wiring Panel Event _before" "^[ \t]*.*_before\\([a-zA-Z0-9_$.]+\\)[ \t]*:[ \t]*function[ \t]*(" 1)
+
+          ("Auto-Wiring View Event 1"        "^[ \t]*\\(afterInitialDataFetch\\)[ \t]*:[ \t]*function[ \t]*(" 1)
+          ("Auto-Wiring View Event 0"        "^[ \t]*\\(afterViewLoad\\)[ \t]*:[ \t]*function[ \t]*(" 1)
+
+          ("Variable"                        "^[ \t]*\\([a-zA-Z_.]+\\): [^f]" 1)
+
+          ("Controller Extension"            "var[ \t]*\\([^ \t]+\\)[ \t]*= View.extendController(" 1)
+          ("Controller Extension"            "var[ \t]*\\([^ \t]+\\)[ \t]*= .*[cC]ontroller.*extend(" 1)
+          ("Controller"                      "var[ \t]*\\([^ \t]+\\)[ \t]*= View.createController(" 1)
+          ))
+#+end_src
+
+See http://blog.binchen.org/posts/why-emacs-is-better-editor-part-two.html:
+
+#+begin_src emacs-lisp
+;; {{ Patching Imenu in js2-mode
+(setq js2-imenu-extra-generic-expression javascript-common-imenu-regex-list)
+
+(defvar js2-imenu-original-item-lines nil
+  "List of line information of original Imenu items.")
+
+(defun js2-imenu--get-line-start-end (pos)
+  (let (b e)
+    (save-excursion
+      (goto-char pos)
+      (setq b (line-beginning-position))
+      (setq e (line-end-position)))
+    (list b e)))
+
+(defun js2-imenu--get-pos (item)
+  (let (val)
+    (cond
+     ((integerp item)
+      (setq val item))
+
+     ((markerp item)
+      (setq val (marker-position item))))
+
+    val))
+
+(defun js2-imenu--get-extra-item-pos (item)
+  (let (val)
+    (cond
+     ((integerp item)
+      (setq val item))
+
+     ((markerp item)
+      (setq val (marker-position item)))
+
+     ;; plist
+     ((and (listp item) (listp (cdr item)))
+      (setq val (js2-imenu--get-extra-item-pos (cadr item))))
+
+     ;; alist
+     ((and (listp item) (not (listp (cdr item))))
+      (setq val (js2-imenu--get-extra-item-pos (cdr item)))))
+
+    val))
+
+(defun js2-imenu--extract-line-info (item)
+  "Recursively parse the original imenu items created by js2-mode.
+The line numbers of items will be extracted."
+  (let (val)
+    (if item
+      (cond
+       ;; Marker or line number
+       ((setq val (js2-imenu--get-pos item))
+        (push (js2-imenu--get-line-start-end val)
+              js2-imenu-original-item-lines))
+
+       ;; The item is Alist, example: (hello . 163)
+       ((and (listp item) (not (listp (cdr item))))
+        (setq val (js2-imenu--get-pos (cdr item)))
+        (if val (push (js2-imenu--get-line-start-end val)
+                      js2-imenu-original-item-lines)))
+
+       ;; The item is a Plist
+       ((and (listp item) (listp (cdr item)))
+        (js2-imenu--extract-line-info (cadr item))
+        (js2-imenu--extract-line-info (cdr item)))
+
+       ;;Error handling
+       (t (message "[Impossible to here! item=%s]" item)
+          )))
+    ))
+
+(defun js2-imenu--item-exist (pos lines)
+  "Try to detect does POS belong to some LINE"
+  (let (rlt)
+    (dolist (line lines)
+      (if (and (< pos (cadr line)) (>= pos (car line)))
+          (setq rlt t)))
+    rlt))
+
+(defun js2-imenu--is-item-already-created (item)
+  (unless (js2-imenu--item-exist
+           (js2-imenu--get-extra-item-pos item)
+           js2-imenu-original-item-lines)
+    item))
+
+(defun js2-imenu--check-single-item (r)
+  (cond
+   ((and (listp (cdr r)))
+    (let (new-types)
+      (setq new-types
+            (delq nil (mapcar 'js2-imenu--is-item-already-created (cdr r))))
+      (if new-types (setcdr r (delq nil new-types))
+        (setq r nil))))
+   (t (if (js2-imenu--item-exist (js2-imenu--get-extra-item-pos r)
+                                 js2-imenu-original-item-lines)
+          (setq r nil))))
+  r)
+
+(defun js2-imenu--remove-duplicate-items (extra-rlt)
+  (delq nil (mapcar 'js2-imenu--check-single-item extra-rlt)))
+
+(defun js2-imenu--merge-imenu-items (rlt extra-rlt)
+  "RLT contains imenu items created from AST.
+EXTRA-RLT contains items parsed with simple regex.
+Merge RLT and EXTRA-RLT, items in RLT has *higher* priority."
+  ;; Clear the lines.
+  (set (make-variable-buffer-local 'js2-imenu-original-item-lines) nil)
+  ;; Analyze the original imenu items created from AST,
+  ;; I only care about line number.
+  (dolist (item rlt)
+    (js2-imenu--extract-line-info item))
+
+  ;; @see https://gist.github.com/redguardtoo/558ea0133daa72010b73#file-hello-js
+  ;; EXTRA-RLT sample:
+  ;; ((function ("hello" . #<marker 63>) ("bye" . #<marker 128>))
+  ;;  (controller ("MyController" . #<marker 128))
+  ;;  (hellworld . #<marker 161>))
+  (setq extra-rlt (js2-imenu--remove-duplicate-items extra-rlt))
+  (append rlt extra-rlt))
+
+(eval-after-load 'js2-mode
+  '(progn
+     (defadvice js2-mode-create-imenu-index (around leuven-js2-mode-create-imenu-index activate)
+       (let (rlt extra-rlt)
+         ad-do-it
+         (setq extra-rlt
+               (save-excursion
+                 (imenu--generic-function js2-imenu-extra-generic-expression)))
+         (setq ad-return-value (js2-imenu--merge-imenu-items ad-return-value extra-rlt))
+         ad-return-value))))
+;; }}
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (defun leuven--archibus-js-imenu-make-index ()
+    (save-excursion
+      (imenu--generic-function leuven-archibus-javascript-common-imenu-regex-list)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+    ;; Imenu support for frameworks and structural patterns.
+    (js2-imenu-extras-setup)
+#+end_src
+
+#+begin_src emacs-lisp
+    (defun js2-imenu-record-object-clone-extend ()
+      (let* ((node (js2-node-at-point (1- (point)))))
+      (when (js2-call-node-p node)
+        (let* ((args (js2-call-node-args node))
+               (methods (second args))
+               (super-class (first args))
+               (parent (js2-node-parent node)))
+          (when (js2-object-node-p methods)
+            (let ((subject (cond ((js2-var-init-node-p parent)
+                                  (js2-var-init-node-target parent))
+                                 ((js2-assign-node-p parent)
+                                  (js2-assign-node-left parent)))))
+              (when subject
+                (js2-record-object-literal methods
+                                           (js2-compute-nested-prop-get subject)
+                                           (js2-node-abs-pos methods)))))))))
+#+end_src
+
+*** Others
+
+Highlight every variable in its own, consistent color -- "semantic highlighting"
+or "hashed highlighting" (in
+http://www.wilfred.me.uk/blog/2014/09/27/the-definitive-guide-to-syntax-highlighting/).
+
+#+begin_src emacs-lisp
+    ;; Color identifiers based on their names.
+    (with-eval-after-load "color-identifiers-mode-autoloads"
+      (add-hook 'js2-mode-hook 'color-identifiers-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+    ;; JS-comint.
+    ;; (define-key js2-mode-map (kbd "C-c b")   #'js-send-buffer)
+    ;; (define-key js2-mode-map (kbd "C-c C-b") #'js-send-buffer-and-go)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+    ;; ;; js2-mode steals TAB, let's steal it back for yasnippet
+    ;; (defun js2-tab-properly ()
+    ;;   (interactive)
+    ;;   (let ((yas-fallback-behavior 'return-nil))
+    ;;     (unless (yas-expand)
+    ;;       (indent-for-tab-command)
+    ;;       (if (looking-back "^\s*")
+    ;;           (back-to-indentation)))))
+    ;;
+    ;; (define-key js2-mode-map (kbd "TAB") #'js2-tab-properly)
+#+end_src
+
+There are 4 popular JavaScript Linting tools:
+
+1. JSLint (the oldest),
+2. JSHint,
+3. JSCS and
+4. ESLint.
+
+We prefer ~eslint~ over ~jshint~.
+
+Install Node and ~npm~ (the package manager for JavaScript):
+- Install https://nodejs.org/en/download/.
+- Run ~node -v~ (to see if ~node~ is correctly installed).
+- Type ~npm~ at the command prompt.
+- Run ~npm -v~ (to see if ~npm~ is correctly installed).
+
+Install ESLint (globally) using ~npm~:
+- Type ~npm install -g eslint~.
+- Type ~eslint -v~ at the command prompt (to view version and confirm that it's
+  in your ~PATH~).
+- Set up a configuration file with ~eslint --init~.
+
+#+begin_src emacs-lisp
+
+;; Disable JSHint since we prefer ESLint checking.
+(with-eval-after-load "flycheck"
+
+  ;; (setq-default flycheck-disabled-checkers
+  ;;               (append flycheck-disabled-checkers
+  ;;                       '(javascript-jshint)))
+
+  (setq-default flycheck-disabled-checkers
+                (append flycheck-disabled-checkers
+                        '(javascript-eslint)))
+
+  ;; ;; use eslint with web-mode for jsx files
+  ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
+
+    ;; (add-hook 'js2-mode-hook
+    ;;           #'(lambda () (flycheck-select-checker "javascript-eslint")))
+
+  (add-hook 'js2-mode-hook
+            (defun leuven--js2-mode-setup ()
+              (flycheck-mode t)
+              ;; (when (executable-find "eslint")
+              ;;   (flycheck-select-checker 'javascript-eslint))
+              ))
+
+  ;; (setq flycheck-display-errors-function
+  ;;       'flycheck-display-error-messages-unless-error-list)
+  ;;
+  ;; ;; (setq flycheck-standard-error-navigation nil)
+  ;;
+  ;; (setq flycheck-global-modes '(not erc-mode
+  ;;                                   message-mode
+  ;;                                   git-commit-mode
+  ;;                                   view-mode
+  ;;                                   outline-mode
+  ;;                                   text-mode
+  ;;                                   org-mode))
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+    ;; (define-key js2-mode-map (kbd "C-c d") #'my/insert-or-flush-debug)
+
+    (defvar my/debug-counter 1)
+    (defun my/insert-or-flush-debug (&optional reset beg end)
+      (interactive "pr")
+      (cond
+       ((= reset 4)
+        (save-excursion
+          (flush-lines "console.log('DEBUG: [0-9]+" (point-min) (point-max))
+          (setq my/debug-counter 1)))
+       ((region-active-p)
+        (save-excursion
+          (goto-char end)
+          (insert ");\n")
+          (goto-char beg)
+          (insert (format "console.log('DEBUG: %d', " my/debug-counter))
+          (setq my/debug-counter (1+ my/debug-counter))
+          (js2-indent-line)))
+       (t
+        ;; Wrap the region in the debug.
+        (insert (format "console.log('DEBUG: %d');\n" my/debug-counter))
+        (setq my/debug-counter (1+ my/debug-counter))
+        (backward-char 3)
+        (js2-indent-line))))
+#+end_src
+
+#+begin_src emacs-lisp
+;;   (setup "jquery-doc"
+;;     (setup-hook 'js-mode-hook 'jquery-doc-setup)
+;;     (setup-after "popwin"
+;;       (push '("^\\*jQuery doc" :regexp t) popwin:special-display-config))
+;;     (setup-keybinds js-mode-map
+;;       "<f1> s" 'jquery-doc)))
+#+end_src
+
+*** Tern
+
+Tern is a stand-alone *code analyzer* for JavaScript.  Features provided are:
+
+- *Auto-completion* on variables and properties.
+- When the point is in a *function argument* list, show *argument names and types*
+  at the bottom of the screen.
+- *Find type* of an expression.
+- *Jump to definition* of something.
+- Automatic *refactoring* (*rename variable*).
+
+The following additional keys are bound:
+
+- M-. ::
+     *Jump to* the *definition* of the thing under the cursor.
+
+- M-, ::
+     Brings you back to last place you were when you pressed ~M-.~.
+
+- C-c C-r ::
+     Rename the variable under the cursor.
+
+- C-c C-c ::
+     Find the type of the thing under the cursor.
+
+- C-c C-d ::
+     Find docs of the thing under the cursor.  Press again to open the
+     associated URL (if any).
+
+#+begin_src emacs-lisp
+    (when (executable-find "tern")
+      (add-hook 'js-mode-hook  #'tern-mode)
+      (add-hook 'js2-mode-hook #'tern-mode)
+      (add-hook 'web-mode-hook #'tern-mode))
+#+end_src
+
+*** Skewer: live web development with Emacs
+
+Skewer lets you send HTML, CSS, and JavaScript fragments to a browser.
+
+See [[https://www.youtube.com/watch?v=4tyTgyzUJqM][Skewer -- Emacs browser interaction]].
+
+#+begin_tip
+You may need to start Chrome with ~chrome --allow-running-insecure-content~, if
+you're using the user script with HTTPS sites.
+#+end_tip
+
+Kick things off with ~run-skewer~, and then:
+
+- ~C-x C-e~ (~skewer-eval-last-expression~) ::
+     *Evaluate the form before the point* and display the result in the
+     minibuffer.  If given a prefix argument, insert the result into the current
+     buffer.
+
+- ~C-M-x~ (~skewer-eval-defun~) ::
+     *Evaluate the top-level form around the point*.
+
+- ~C-c C-k~ (~skewer-load-buffer~) ::
+     *Load the current buffer.*
+
+- ~C-c C-z~ (~skewer-repl~) ::
+     *Select the REPL buffer*.
+
+#+begin_src emacs-lisp
+;; (require 'css-mode)
+;; (define-key css-mode-map (kbd "C-c i") #'emr-css-toggle-important)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (with-eval-after-load "skewer-mode-autoloads" ; Not using it yet.
+    (add-hook 'js2-mode-hook 'skewer-mode)
+    (add-hook 'css-mode-hook 'skewer-css-mode)
+    (add-hook 'html-mode-hook 'skewer-html-mode))
+#+end_src
+
+To ensure that everything is working correctly:
+
+1. Open a new buffer with the name =myskewer.js=.
+2. Enable ~JS2-mode~ (a dependency of skewer).
+3. Enable ~skewer-mode~.
+4. ~M-x run-skewer~ (a browser opens, go back to =myskewer.js=).
+5. Type ~alert("hello");~ and hit ~C-x C-e~ at the end of that line.
+6. Go back to the browser.
+
+You should see an alert box on the page.
+
+To tell Skewer to load the HTML (as shown in the demo), place your downloaded
+files into =~/public_html= then follow the instructions for [[https://github.com/skeeto/skewer-mode#manual-version][Manual version]]. Once
+that is done, visit ~localhost:8080~ in your browser.
+
+** SQL
+
+Working with SQL databases.
+
+- C-c C-b (M-x sql-send-buffer) ::
+
+- C-c C-c (M-x sql-send-paragraph) ::
+
+- C-c C-r (M-x sql-send-region) ::
+
+- C-c C-n (M-x sql-send-line-and-next) ::
+     Send the current line to the SQL process and advances to the next line,
+     skipping whitespace and comments.
+
+- C-c C-s (M-x sql-send-string) ::
+
+- C-c C-l a (M-x sql-list-all) ::
+
+- C-c C-l t (M-x sql-list-table) ::
+
+- C-c C-i (M-x sql-product-interactive) ::
+     Start SQLi session.
+
+- C-c C-z (M-x sql-show-sqli-buffer) ::
+     Show the current SQLi buffer.
+
+Server list.
+
+#+begin_src emacs-lisp :tangle no
+  (idle-require 'sql)
+
+  (setq sql-connection-alist
+        '((localhost_HQ     (sql-product  'ms)
+                            (sql-port     1433)
+                            (sql-server   "localhost")
+                            (sql-user     "afm")
+                            (sql-password "afm")
+                            (sql-database "ARCHIBUS_23_1_HQ"))
+
+          (localhost_Schema (sql-product  'ms)
+                            (sql-port     1433)
+                            (sql-server   "localhost")
+                            (sql-user     "afm")
+                            (sql-password "afm")
+                            (sql-database "ARCHIBUS_23_1_Schema"))
+
+          (localhost_PFlow  (sql-product  'ms)
+                            (sql-port     1433)
+                            (sql-server   "localhost")
+                            (sql-user     "")
+                            (sql-password "")
+                            (sql-database "PFlowXiphias"))
+
+          (localhost_CSPO   (sql-product  'oracle)
+                            (sql-port     1521)
+                            (sql-server   "localhost")
+                            (sql-user     "afm")
+                            (sql-password "AFM")
+                            (sql-database "CSPOv213"))))
+
+  (defun sql-localhost_HQ ()
+    (interactive)
+    (sql-connect-preset 'localhost_HQ))
+
+  (defun sql-localhost_Schema ()
+    (interactive)
+    (sql-connect-preset 'localhost_Schema))
+
+  (defun sql-localhost_CSPO ()
+    (interactive)
+    (sql-connect-preset 'localhost_CSPO))
+
+  (defun sql-localhost_PFlow ()
+    (interactive)
+    (sql-connect-preset 'localhost_PFlow))
+
+  ;; This makes all it all happen via M-x sql-localhost_HQ, etc.
+  (defun sql-connect-preset (name)
+    "Connect to a predefined SQL connection listed in `sql-connection-alist'"
+    (eval `(let ,(cdr (assoc name sql-connection-alist))
+             (flet ((sql-get-login (&rest what))) ; In sql.el.
+               (sql-product-interactive sql-product)))))
+#+end_src
+
+See https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client.
+
+#+begin_src emacs-lisp :tangle no
+  (add-hook 'sql-mode-hook
+            #'(lambda ()
+                (setq truncate-lines t)
+                (sql-highlight-ms-keywords)
+                (setq sql-send-terminator t)
+                (setq comint-process-echoes t)))
+
+  (add-hook 'sql-interactive-mode-hook
+            #'(lambda ()
+                (setq truncate-lines t)
+                (setq comint-process-echoes t)
+                ;; (text-scale-decrease 1)
+                (setq-local show-trailing-whitespace nil)))
+#+end_src
+
+Basic config for MS SQL.
+
+#+begin_src emacs-lisp :tangle no
+  ;; Default login parameters to connect to Microsoft procSQL Server.
+  (setq sql-ms-login-params
+        '((user     :default "afm")
+          (database :default "ARCHIBUS_23_1_HQ")
+          (server   :default "localhost")
+          (port     :default 1433)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (setq sql-ms-program "sqlcmd")
+
+  ;; Force Emacs to use CP 850 for every sqlcmd process (for accents) and
+  ;; force DOS line endings.
+  (add-to-list 'process-coding-system-alist '("sqlcmd" . cp850-dos))
+  (add-to-list 'process-coding-system-alist '("osql" . cp850-dos))
+
+  ;; (setq sql-ms-options '("-w" "65535" "-h" "20000" ))
+  (setq sql-ms-options '("-w" "65535"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+  (setq sql-ms-program "tsql")
+
+  (setq sql-ms-options (remove "-n" sql-ms-options))
+  (setq sql-ms-options nil)
+
+  ;; Redefined.
+  (defun sql-comint-ms (product options)
+    "Create comint buffer and connect to Microsoft SQL Server."
+    ;; Put all parameters to the program (if defined) in a list and call
+    ;; make-comint.
+    (message "[Leuven Options: %s]" options)
+    (let ((params options))
+      (if (not (string= "" sql-server))
+          (setq params (append (list "-S" sql-server) params)))
+      (if (not (string= "" sql-database))
+          (setq params (append (list "-D" sql-database) params)))
+      (if (not (string= "" sql-user))
+          (setq params (append (list "-U" sql-user) params)))
+      (if (not (string= "" sql-password))
+          (setq params (append (list "-P" sql-password) params))
+        (if (string= "" sql-user)
+            ;; if neither user nor password is provided, use system credentials.
+            (setq params (append (list "-E") params))
+          ;; If -P is passed to ISQL as the last argument without a password, it's
+          ;; considered null.
+          (setq params (append params (list "-P")))))
+      (message "[Leuven Params: %s]" params)
+      (sql-comint product params)))
+#+end_src
+
+Basic config for Oracle.
+
+#+begin_src emacs-lisp :tangle no
+  (add-to-list 'process-coding-system-alist '("sqlplus" . windows-1252))
+#+end_src
+
+Have a look at https://www.emacswiki.org/emacs/SqlPlus.
+
+When using sql-send-region to execute a query in a SQLi buffer, the table
+formatting is off because the column names are printed on the same row as the
+the prompt. By adding a newline before the comint output we can make sure
+everything lines up nice. This will add a preceding newline to every comint
+output, even queries run at the prompt - though the extra line isn't too
+noticeable.
+
+#+begin_src emacs-lisp :tangle no
+  (defvar sql-last-prompt-pos 1
+    "position of last prompt when added recording started")
+  (make-variable-buffer-local 'sql-last-prompt-pos)
+  (put 'sql-last-prompt-pos 'permanent-local t)
+
+  (defun sql-add-newline-first (output)
+    "Add newline to beginning of OUTPUT for `comint-preoutput-filter-functions'
+    This fixes up the display of queries sent to the inferior buffer
+    programatically."
+    (let ((begin-of-prompt
+           (or (and comint-last-prompt-overlay
+                    ;; sometimes this overlay is not on prompt
+                    (save-excursion
+                      (goto-char (overlay-start comint-last-prompt-overlay))
+                      (looking-at-p comint-prompt-regexp)
+                      (point)))
+               1)))
+      (if (> begin-of-prompt sql-last-prompt-pos)
+          (progn
+            (setq sql-last-prompt-pos begin-of-prompt)
+            (concat "\n" output))
+        output)))
+
+  (defun sqli-add-hooks ()
+    "Add hooks to `sql-interactive-mode-hook'."
+    (add-hook 'comint-preoutput-filter-functions
+              'sql-add-newline-first))
+
+  (add-hook 'sql-interactive-mode-hook 'sqli-add-hooks)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+;; starting SQL mode loading sql-indent / sql-complete
+(eval-after-load "sql"
+  '(progn
+     (load-library "sql-indent")
+     ;; (load-library "sql-complete")
+     ;; (load-library "sql-transform")
+))
+#+end_src
+
+*** Troubleshooting
+
+1. Start with ~ping~:
+
+:  ping myhost
+
+2. Test with ~telnet~:
+
+:  telnet myhost 1433
+
+3. Test with ~tsql~:
+
+:  tsql -H myhost -p 1433 -U sa   # Bypassing `/etc/freetds/freetds.conf'.
+:  tsql -S myserver -U sa         # Using `/etc/freetds/freetds.conf'.
+
+   or ~sqsh~:
+
+:  sqsh -S myhost -p 1433 -U sa   # Bypassing `/etc/freetds/freetds.conf'.
+
+You need to write your command like this
+
+#+begin_src sql :tangle no
+SELECT * FROM c_props
+go
+#+end_src
+
+Alternatively, in ~sqsh~, if you set the ~semicolon_hack~ variable (which turns on
+the ability to use a semicolon as a sort of in-line go), you can do:
+
+#+begin_src sql :tangle no
+SELECT * FROM c_props;
+#+end_src
+
+*** Indenting
+
+http://emacs.stackexchange.com/questions/13214/automatically-formatting-sql-code
+Emacs does not come anything useful for sql indenting.
+The best thing out there is sql-indent.el
+Which doesn't do auto-indenting only on command indentation.
+I have found it pretty useful at times.
+
+#+begin_src emacs-lisp :tangle no
+  (with-eval-after-load "sql-indent"
+    (add-hook 'sql-mode-hook 'sqlind-setup))
+#+end_src
+
+*** SQL beautify
+
+https://www.emacswiki.org/emacs/SqlBeautify
+
+*** Word case
+
+Automatically convert SQL *keywords to* the *upper case* (see general well-known
+[[http://stackoverflow.com/questions/522356/what-sql-coding-standard-do-you-follow][coding standards]] and styles for SQL).
+
+#+begin_src emacs-lisp :tangle no
+  (with-eval-after-load "sqlup-mode-autoloads"
+    (add-hook 'sql-mode-hook 'sqlup-mode)
+    (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
+#+end_src
+
+*** SQL Remove Square Brackets
+
+#+begin_src emacs-lisp
+)                                       ; Chapter 26 ends here.
+#+end_src
+
