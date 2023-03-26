@@ -1,0 +1,407 @@
+* All-the-icons
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons
+  :ensure t)
+#+END_SRC
+* Doom-Themes
+#+BEGIN_SRC emacs-lisp
+  (message "use-package doom-themes")
+  (use-package doom-themes
+    :ensure t
+    :init
+    (load-theme 'doom-one t)
+    (doom-themes-treemacs-config)
+    (setq neo-global--window nil)
+    (setq hl-line-sticky-flag nil)
+    (setq neo-vc-integration nil)
+    (setq neotree-dir-button-keymap nil)
+    (setq neotree-file-button-keymap nil)
+    (setq neo-path--file-short-name nil)
+    (setq neo-vc-for-node nil)
+    (setq neo-buffer--insert-fold-symbol nil)
+    (setq neo-buffer--node-list-set nil)
+    (setq neo-buffer--newline-and-begin nil)
+    (setq neo-global--select-window nil)
+    (setq neo-buffer--insert-file-entry nil)
+    (setq neo-buffer--insert-dir-entry nil)
+    (setq neo-buffer--insert-root-entry nil))
+#+END_SRC
+* Doom-Modeline
+#+BEGIN_SRC emacs-lisp
+  (message "use-package doom-modeline")
+  (use-package doom-modeline
+    :ensure t
+    :hook (after-init . doom-modeline-mode))
+#+END_SRC
+* Helm
+#+BEGIN_SRC emacs-lisp
+  (message "use-package helm")
+  (use-package helm
+  :ensure t
+  :init
+  (helm-mode 1)
+  :bind
+    ("C-x C-f" . 'helm-find-files)
+    ("C-x C-b" . 'helm-buffers-list)
+    ("M-x" . 'helm-M-x))
+  (helm-autoresize-mode 1)
+#+END_SRC
+* Helm-Lsp
+#+BEGIN_SRC emacs-lisp
+  (message "use-package helm-lsp")
+  (use-package helm-lsp
+    :ensure t
+    :commands helm-lsp-workspace-symbol)
+#+END_SRC
+* Company
+#+BEGIN_SRC emacs-lisp
+  (message "use-package company")
+  (use-package company
+    :ensure t
+    :hook (scala-mode . company-mode)
+    :config
+    (setq lsp-completion-provider :capf)
+    (setq company-idle-delay 0)
+    (setq company-minimum-prefix-length 2))
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "M-n") nil)
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "C-n") #'company-select-next)
+    (define-key company-active-map (kbd "C-p") #'company-select-previous)
+    (define-key company-active-map (kbd "<tab>") #'company-abort))
+  (add-hook 'c++-mode-hook 'yas-minor-mode)
+  (add-hook 'c-mode-hook 'yas-minor-mode)
+  (with-eval-after-load 'company
+    (add-hook 'c++-mode-hook 'company-mode)
+    (add-hook 'c-mode-hook 'company-mode))
+  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+  (add-hook 'emacs-lisp-mode-hook 'yas-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'company-mode)
+  (defun check-expansion ()
+      (save-excursion
+        (if (looking-at "\\_>") t
+          (backward-char 1)
+          (if (looking-at "\\.") t
+            (backward-char 1)
+            (if (looking-at "->") t nil)))))
+    (defun do-yas-expand ()
+      (let ((yas/fallback-behavior 'return-nil))
+        (yas/expand)))
+    (defun tab-indent-or-complete ()
+      (interactive)
+      (if (minibufferp)
+          (minibuffer-complete)
+        (if (or (not yas/minor-mode)
+                (null (do-yas-expand)))
+            (if (check-expansion)
+                (company-complete-common)
+              (indent-for-tab-command)))))
+  (global-set-key [tab] 'tab-indent-or-complete)
+  (add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+* Company-Lsp
+ company-lsp no longer available #2641 
+#+BEGIN_SRC emacs-lisp
+;(use-package company-lsp
+;  :ensure t
+;  :commands company-lsp)
+#+END_SRC
+* Yasnippet
+#+BEGIN_SRC emacs-lisp
+   (message "use-package yasnippet")
+  (use-package yasnippet
+    :ensure t
+    :config
+      (yas-reload-all))
+  (define-key global-map (kbd "C-c C-y") 'yas-new-snippet)
+  (defun yas/org-very-safe-expand ()
+  (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
+  (add-hook 'org-mode-hook
+  (lambda ()
+  (make-variable-buffer-local 'yas/trigger-key)
+  (setq yas/trigger-key [tab])
+  (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
+  (define-key yas/keymap [tab] 'yas/next-field)))
+#+END_SRC
+* Org-Bullets
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+* Quickrun
+#+BEGIN_SRC emacs-lisp
+(use-package quickrun
+  :ensure t
+  :bind("<f5>". 'quickrun-shell))
+#+END_SRC
+* Treemacs
+#+BEGIN_SRC emacs-lisp
+(use-package treemacs
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 t
+          treemacs-file-event-delay              5000
+          treemacs-file-extension-regex          treemacs-last-period-regex-value
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   2
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         nil
+          treemacs-max-git-entries               5000
+          treemacs-missing-project-action        'ask
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       t
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                      'left
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             t
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-asc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          treemacs-width                         26)
+	  
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+#+END_SRC
+* Electric Pair Mode
+#+BEGIN_SRC emacs-lisp
+(electric-pair-mode 1)
+(setq electric-pair-pairs
+'(
+  (?\" . ?\")
+  (?\' . ?\')
+  (?\{ . ?\})))
+#+END_SRC
+* Move lines with ALT
+#+BEGIN_SRC emacs-lisp
+(defun move-line (n)
+  (interactive "p")
+  (setq col (current-column))
+  (beginning-of-line) (setq start (point))
+  (end-of-line) (forward-char) (setq end (point))
+  (let ((line-text (delete-and-extract-region start end)))
+    (forward-line n)
+    (insert line-text)
+    (forward-line -1)
+    (forward-char col)))
+(defun move-line-up (n)
+  (interactive "p")
+  (move-line (if (null n) -1 (- n))))
+(defun move-line-down (n)
+  (interactive "p")
+  (move-line (if (null n) 1 n)))
+(global-set-key (kbd "M-<up>") 'move-line-up)
+(global-set-key (kbd "M-<down>") 'move-line-down)
+#+END_SRC
+* Blinking Brackets
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode 1)
+#+END_SRC
+* Kill whole line for terminal
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-h") 'kill-whole-line) 
+#+END_SRC
+* Linum Mode
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook 'linum-mode)
+#+END_SRC
+* Lsp-Mode
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :commands lsp
+  :ensure t
+  :hook(c-mode . lsp))
+#+END_SRC
+* Lsp-Treemacs
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list)
+#+END_SRC
+* Dashboard
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-items '((recents  . 5)
+			  (bookmarks . 5)))
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-startup-banner "~/.emacs.d/CondorEmacs.png")
+  (setq dashboard-banner-logo-title "Welcome to Condor Emacs!")
+  (setq dashboard-set-navigator t)
+  (setq dashboard-navigator-buttons
+	`(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+	    "Homepage"
+	    "Browse homepage"
+	    (lambda (&rest _) (browse-url "https://github.com/apemangr/Condor-Emacs/")))
+
+	   (,(all-the-icons-faicon "archive" :height 1.1 :v-adjust 0.0)
+	    "Update Packages"
+	    "Click to updates your packages"
+	    (lambda (&rest _) (auto-package-update-now)))
+
+	   (,(all-the-icons-octicon "gear" :height 1.1 :v-adjust 0.0)
+	    "Configuration"
+	    "Click to config Condor Emacs"
+	    (lambda (&rest _) (find-file "~/.emacs.d/config.org")))))))
+#+END_SRC
+* Better scrolling
+#+BEGIN_SRC emacs-lisp
+(setq scroll-step 1)
+(setq scroll-margin 1)
+(setq scroll-conservatively 101)
+(setq scroll-up-aggressively 0.01)
+(setq scroll-down-aggressively 0.01)
+(setq auto-window-vscroll nil)
+(setq fast-but-imprecise-scrolling nil)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
+(setq mouse-wheel-progressive-speed nil)
+;; Horizontal Scroll
+(setq hscroll-step 1)
+(setq hscroll-margin 1)
+#+END_SRC
+* Org-mode
+#+begin_src emacs-lisp
+(setq org-startup-indented t
+      org-bullets-bullet-list '(" ") ;; no bullets, needs org-bullets package
+      org-ellipsis "  " ;; folding symbol
+      org-pretty-entities t
+      org-hide-emphasis-markers t
+      ;; show actually italicized text instead of /italicized text/
+      org-agenda-block-separator ""
+      org-fontify-whole-heading-line t
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
+
+(add-hook 'org-mode-hook (lambda ()
+   "Beautify Org Checkbox Symbol"
+   (push '("[ ]" .  "☐") prettify-symbols-alist)
+   (push '("[X]" . "☑" ) prettify-symbols-alist)
+   (push '("[-]" . "❍" ) prettify-symbols-alist)
+   (push '("#+BEGIN_SRC" . "↦" ) prettify-symbols-alist)
+   (push '("#+END_SRC" . "⇤" ) prettify-symbols-alist)
+   (push '("#+BEGIN_EXAMPLE" . "↦" ) prettify-symbols-alist)
+   (push '("#+END_EXAMPLE" . "⇤" ) prettify-symbols-alist)
+   (push '("#+BEGIN_QUOTE" . "↦" ) prettify-symbols-alist)
+   (push '("#+END_QUOTE" . "⇤" ) prettify-symbols-alist)
+   (push '("#+begin_quote" . "↦" ) prettify-symbols-alist)
+   (push '("#+end_quote" . "⇤" ) prettify-symbols-alist)
+   (push '("#+begin_example" . "↦" ) prettify-symbols-alist)
+   (push '("#+end_example" . "⇤" ) prettify-symbols-alist)
+   (push '("#+begin_src" . "↦" ) prettify-symbols-alist)
+   (push '("#+end_src" . "⇤" ) prettify-symbols-alist)
+   (prettify-symbols-mode)))
+#+end_src
+* Dired, the Directory Editor
+#+BEGIN_SRC emacs-lisp
+  (use-package dired
+    :ensure nil
+    :config
+    ;; Switches passed to `ls' for Dired.
+    (setq dired-listing-switches "-alt")
+    :custom (dired-dwim-target t "guess a target directory")
+    :hook
+    (dired-mode . dired-hide-details-mode)
+  )
+  (use-package dired-hacks-utils
+    :ensure t
+    )
+#+END_SRC
+
+This provides a sidebar with a dired buffer for the current directory
+#+BEGIN_SRC emacs-lisp
+  (use-package dired-toggle
+    :defer t)
+#+END_SRC
+
+Usually I'm not interested in dotfiles
+#+BEGIN_SRC emacs-lisp
+  (use-package dired-hide-dotfiles
+    :bind
+    (:map dired-mode-map
+          ("." . dired-hide-dotfiles-mode))
+    :hook
+    (dired-mode . dired-hide-dotfiles-mode))
+#+END_SRC
+
+And I like more colors
+#+BEGIN_SRC emacs-lisp
+  (use-package diredfl
+    :ensure t
+    :hook
+    (dired-mode . diredfl-mode))
+#+END_SRC
+
+From http://pragmaticemacs.com/emacs/tree-style-directory-views-in-dired-with-dired-subtree/
+
+The dired-subtree package (part of the magnificent dired hacks) improves on this by
+allowing you to expand subdirectories in place, like a tree structure. To install the
+package, use the following code:
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package dired-subtree
+  ;;   :ensure nil
+  ;;   :config
+  ;;   (bind-keys :map dired-mode-map
+  ;;              ("i" . dired-subtree-insert)
+  ;;              (";" . dired-subtree-remove)))
+#+END_SRC
+
+This sets up the keybinds so that in dired, hitting i on a subdirectory expands it in
+place with an indented listing. You can expand sub-subdirectories in the same way, and so
+on. Hitting ; inside an expanded subdirectory collapses it.
+
+A nice overview for git repositories in dired
+#+begin_src emacs-lisp
+(use-package dired-git-info
+    :ensure t
+    :bind (:map dired-mode-map
+                (")" . dired-git-info-mode)))
+#+end_src
+
+From [[http://pragmaticemacs.com/emacs/dynamically-filter-directory-listing-with-dired-narrow/][Dynamically filter directory listing with dired-narrow | Pragmatic Emacs]] a useful
+addition to narrow dired to match filter
+
+#+begin_src emacs-lisp
+(use-package dired-narrow
+  :ensure t
+  :bind (:map dired-mode-map
+              ("/" . dired-narrow)))
+#+end_src
