@@ -1,0 +1,5 @@
+g++ -x c++  -o /home/ivanir/qr_Iztrmi.out qr_Iztrmi && /home/ivanir/qr_Iztrmi.out 
+emacs -q --no-site-file --batch -l qr_B5uBIa
+emacs -q --no-site-file --batch -l qr_B5uBIa
+emacs -q --no-site-file --batch -l qr_B5uBIa
+emacs -q --no-site-file --batch -l qr_B5uBIa

@@ -22,10 +22,18 @@
   (setq neo-buffer--insert-dir-entry nil)
   (setq neo-buffer--insert-root-entry nil))
 
-(message "use-package doom-modeline")
-(use-package doom-modeline
-  :ensure t
-  :hook (after-init . doom-modeline-mode))
+(use-package leuven-theme
+     :config
+     (load-theme 'leuven t)
+     (setq leuven-scale-outline-headlines nil)
+     (setq leuven-scale-org-agenda-structure nil)
+     (setq leuven-scale-volatile-highlight nil)
+)
+
+;; (message "use-package doom-modeline")
+;; (use-package doom-modeline
+;;   :ensure t
+;;   :hook (after-init . doom-modeline-mode))
 
 (message "use-package helm")
 (use-package helm
@@ -108,8 +116,9 @@
 
 (use-package org-bullets
   :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+  ;:config
+  ;(add-hook 'org-mode-hook (lambda () (org-bullets-mode)))
+)
 
 (use-package quickrun
   :ensure t
@@ -268,24 +277,24 @@
       org-fontify-done-headline t
       org-fontify-quote-and-verse-blocks t)
 
-(add-hook 'org-mode-hook (lambda ()
-   "Beautify Org Checkbox Symbol"
-   (push '("[ ]" .  "☐") prettify-symbols-alist)
-   (push '("[X]" . "☑" ) prettify-symbols-alist)
-   (push '("[-]" . "❍" ) prettify-symbols-alist)
-   (push '("#+BEGIN_SRC" . "↦" ) prettify-symbols-alist)
-   (push '("#+END_SRC" . "⇤" ) prettify-symbols-alist)
-   (push '("#+BEGIN_EXAMPLE" . "↦" ) prettify-symbols-alist)
-   (push '("#+END_EXAMPLE" . "⇤" ) prettify-symbols-alist)
-   (push '("#+BEGIN_QUOTE" . "↦" ) prettify-symbols-alist)
-   (push '("#+END_QUOTE" . "⇤" ) prettify-symbols-alist)
-   (push '("#+begin_quote" . "↦" ) prettify-symbols-alist)
-   (push '("#+end_quote" . "⇤" ) prettify-symbols-alist)
-   (push '("#+begin_example" . "↦" ) prettify-symbols-alist)
-   (push '("#+end_example" . "⇤" ) prettify-symbols-alist)
-   (push '("#+begin_src" . "↦" ) prettify-symbols-alist)
-   (push '("#+end_src" . "⇤" ) prettify-symbols-alist)
-   (prettify-symbols-mode)))
+;; (add-hook 'org-mode-hook (lambda ()
+;;    "Beautify Org Checkbox Symbol"
+;;    (push '("[ ]" .  "☐") prettify-symbols-alist)
+;;    (push '("[X]" . "☑" ) prettify-symbols-alist)
+;;    (push '("[-]" . "❍" ) prettify-symbols-alist)
+;;    (push '("#+BEGIN_SRC" . "↦" ) prettify-symbols-alist)
+;;    (push '("#+END_SRC" . "⇤" ) prettify-symbols-alist)
+;;    (push '("#+BEGIN_EXAMPLE" . "↦" ) prettify-symbols-alist)
+;;    (push '("#+END_EXAMPLE" . "⇤" ) prettify-symbols-alist)
+;;    (push '("#+BEGIN_QUOTE" . "↦" ) prettify-symbols-alist)
+;;    (push '("#+END_QUOTE" . "⇤" ) prettify-symbols-alist)
+;;    (push '("#+begin_quote" . "↦" ) prettify-symbols-alist)
+;;    (push '("#+end_quote" . "⇤" ) prettify-symbols-alist)
+;;    (push '("#+begin_example" . "↦" ) prettify-symbols-alist)
+;;    (push '("#+end_example" . "⇤" ) prettify-symbols-alist)
+;;    (push '("#+begin_src" . "↦" ) prettify-symbols-alist)
+;;    (push '("#+end_src" . "⇤" ) prettify-symbols-alist)
+;;    (prettify-symbols-mode)))
 
 (use-package dired
   :ensure nil
@@ -293,8 +302,8 @@
   ;; Switches passed to `ls' for Dired.
   (setq dired-listing-switches "-alt")
   :custom (dired-dwim-target t "guess a target directory")
-  :hook
-  (dired-mode . dired-hide-details-mode)
+  ;:hook
+ ; (dired-mode . dired-hide-details-mode)
 )
 (use-package dired-hacks-utils
   :ensure t
@@ -331,3 +340,105 @@
   :ensure t
   :bind (:map dired-mode-map
               ("/" . dired-narrow)))
+
+(use-package bookmark
+   :config
+   ;; Where to save the bookmarks.
+   (setq bookmark-default-file (concat user-emacs-directory "bookmarks.bmk"))
+                                       ;! A `.txt' extension would load Org at
+                                       ;! the time `bookmark' is required!
+
+   ;; Each command that sets a bookmark will also save your bookmarks.
+   (setq bookmark-save-flag 1)
+)
+
+;; Extensions to standard library `bookmark.el'.
+(use-package bookmark+ 
+  :load-path "site-lisp/bookmark-plus"
+  :config
+  ;; Toggle an ANONYMOUS bookmark on the current line.
+  (global-set-key (kbd "<C-f2>") #'bmkp-toggle-autonamed-bookmark-set/delete)
+  (global-set-key (kbd "<S-f2>") #'bmkp-next-bookmark-this-file/buffer-repeat)
+  ;; Delete all ANONYMOUS bookmarks in a buffer.
+  (global-set-key (kbd "<C-S-f2>") #'bmkp-delete-all-autonamed-for-this-buffer)
+  ;; View all bookmarks.
+  (global-set-key (kbd "<M-f2>") #'helm-bookmarks)
+  (add-hook 'find-file-hook #'bmkp-light-this-buffer)
+  ;; Priorities of bookmark highlighting overlay types.
+  (setq bmkp-light-priorities '((bmkp-autonamed-overlays     . 150)
+                                (bmkp-non-autonamed-overlays . 160)))
+
+  ;; Symbols for the fringe bitmaps to use to highlight a bookmark.
+  (setq bmkp-light-left-fringe-bitmap 'filled-square)
+  (setq bmkp-light-right-fringe-bitmap 'filled-square)
+  ;; Default highlight style for ANONYMOUS (= default) bookmarks.
+  (setq bmkp-light-style-autonamed 'line+lfringe)
+  ;; Default highlight style for bookmarks WITH MNEMONICS.
+  (setq bmkp-light-style-non-autonamed 'line+lfringe)
+  ;; Automatically highlight bookmarks when set.
+  (setq bmkp-auto-light-when-set 'all-in-buffer)
+  ;; Automatically highlight bookmarks when jumped to.
+  (setq bmkp-auto-light-when-jump 'all-in-buffer)
+  ;; Don't propertize bookmark names to hold full bookmark data.
+  (setq bmkp-propertize-bookmark-names-flag nil)
+                                    ; We will often be going back and forth
+                                    ; between using Bookmark+ and using
+                                    ; vanilla Emacs.
+  (setq bmkp-last-as-first-bookmark-file nil)
+  ;; Name ANONYMOUS bookmarks with buffer name and line number.
+  (setq bmkp-autoname-format "^%B:[0-9]+: %s")
+  (setq bmkp-autoname-bookmark-function #'leuven-bmkp-autoname-line)
+  (defun leuven-bmkp-autoname-line (position)
+    "Name autonamed bookmark at POSITION using line number."
+    (let ((line  (line-number-at-pos position)))
+      ;; (format "%s:%d (%s)" (buffer-name) line (buffer-file-name))
+      (format "%s:%d: %s"
+              (buffer-name)
+              line
+              (buffer-substring-no-properties
+               (line-beginning-position)
+               (1- (line-beginning-position 2))))))
+   )
+
+;; create the list for font-lock.
+;; each category of keyword is given a particular face
+(setq drc-font-lock-keywords
+      (let* (
+            ;; define several category of keywords
+            (x-keywords '("VERBATIM" "#IFNDEF" "#ENDIF" "elseif" "else" "if" "IFDEF"
+                          "#DEFINE" "FLAG" "while" "VARIABLE"))
+            (x-types '("float" "integer" "key" "list" "rotation" "string" "vector"))
+            (x-constants '("ACTIVE" "AGENT" "ALL_SIDES" "ATTACH_BACK"))
+            (x-events '("at_rot_target" "at_target" "attach"))
+            (x-functions '("llAbs" "llAcos" "llAddToLandBanList" "llAddToLandPassList"))
+
+            ;; generate regex string for each category of keywords
+            (x-keywords-regexp (regexp-opt x-keywords 'words))
+            (x-types-regexp (regexp-opt x-types 'words))
+            (x-constants-regexp (regexp-opt x-constants 'words))
+            (x-events-regexp (regexp-opt x-events 'words))
+            (x-functions-regexp (regexp-opt x-functions 'words)))
+
+        `(
+          (,x-types-regexp . 'font-lock-type-face)
+          (,x-constants-regexp . 'font-lock-constant-face)
+          (,x-events-regexp . 'font-lock-builtin-face)
+          (,x-functions-regexp . 'font-lock-function-name-face)
+          (,x-keywords-regexp . 'font-lock-keyword-face)
+          ;; note: order above matters, because once colored, that part won't change.
+          ;; in general, put longer words first
+          )))
+
+;;;###autoload
+(define-derived-mode drc-mode c-mode "DRC mode"
+  "Major mode for editing Calibre DRC runsets"
+
+  ;; code for syntax highlighting
+  (setq font-lock-defaults '((drc-font-lock-keywords))))
+
+;; add the mode to the `features' list
+(provide 'drc-mode)
+
+;;; drc-mode.el ends here
+;;###autoload
+(add-to-list 'auto-mode-alist '("\\.drc" . drc-mode))

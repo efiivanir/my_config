@@ -64,6 +64,9 @@ alias sync_2T1='sudo rsync -avu --delete "/media/ivanir/2T-1" "/media/ivanir/mis
 alias pyV='python3 -V'
 alias pymakeEnv='python3 -m venv venv'
 alias jup-not='jupyter-notebook  --allow-root'
+alias to_config='cd /home/ivanir/my_config'
+alias to_emacs='cd /home/ivanir/my_config/my_emacs'
+
 
 # gcloud
 alias gc-cil='gcloud compute instances list'
