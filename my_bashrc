@@ -160,6 +160,12 @@ git config --global diff.tool diffmerge
 git config --global difftool.diffmerge.cmd "/usr/bin/diffmerge --nosplash \"\$LOCAL\" \"\$REMOTE\""
 git config --global alias.slog "log --oneline --topo-order --graph"
 
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+git config --global alias.a add
+
 alias git-push="git push origin master --tags"
 alias git-sta="git status"
 alias git-reset-hard='git reset HEAD '
@@ -643,6 +649,11 @@ alias hpv-start='sudo hyperpv-server-service-start'
 alias hpv-stop='sudo hyperpv-server-service-stop'
 alias hpv-status='hyperpv-server-status'
 alias to_hypv='cd /home/ivanir/Prog/py_dir/hypv'
+
+alias hpv-create-play='python /home/ivanir/Prog/py_dir/hypv/my_runs/create_playground_file.py '
+alias hpv-update-init='python /home/ivanir/Prog/py_dir/hypv/my_runs/update_init_tree.py'
+alias hpv-run-rule='/home/ivanir/Prog/py_dir/hypv/my_runs/run_rule.pl '
+alias hpv-create-ruledock='python /home/ivanir/Prog/py_dir/hypv/my_runs/create_ruledeck.py'
 
 #Klayout
 #export KLAYOUT_PYTHONPATH='/home/ivanir/Prog/py_dir/KLayout-python;/usr/lib/python310.zip;/usr/lib/python3.10;/usr/lib/python3.10/lib-dynload;/usr/local/lib/python3.10/dist-packages;/usr/lib/python3/dist-packages'
