@@ -85,6 +85,9 @@ alias dj-mig='python3 manage.py makemigrations ; python3 manage.py migrate'
 alias dj-cresup='python3 manage.py createsuperuser'
 alias dj-shell='python3 manage.py shell'
 
+#postgresql
+alias post-login='sudo -u postgres psql'
+
 # npm
 alias npm-update-g='sudo npm update -g'
 alias npm-update-l='sudo npm update'
@@ -152,7 +155,6 @@ git config --global color.ui auto
 git config --global http.sslVerify false
 git config --global push.followTags true
 git config --global init.defaultBranch master
-
 git config --global merge.tool diffmerge
 git config --global mergetool.diffmerge.cmd "/usr/bin/diffmerge --merge --result=\"\$MERGED\" \"\$LOCAL\" \"\$BASE\" \"\$REMOTE\""
 git config --global mergetool.diffmerge.trustExitCode true
@@ -160,7 +162,6 @@ git config --global mergetool.keepBackup false
 git config --global diff.tool diffmerge
 git config --global difftool.diffmerge.cmd "/usr/bin/diffmerge --nosplash \"\$LOCAL\" \"\$REMOTE\""
 git config --global alias.slog "log --oneline --topo-order --graph"
-
 git config --global alias.co checkout
 git config --global alias.br branch
 git config --global alias.ci commit
@@ -190,7 +191,8 @@ alias calibre-the-econo='ebook-convert /root/.emacs.d/calibre_recepies/The_Econo
 alias gcc-list-c++-options='gcc -xc++ -E -v -'
 alias gcc-list-c-options='gcc -xc -E -v -'
 
-alias toprog='cd ~/Prog'
+alias to_prog='cd ~/Prog'
+alias to_py='cd ~/Prog/py_dir'
 
 function youtube-playlist() {
  id_replacement="'%(autonumber)s-%(title)s.%(ext)s'"
@@ -524,6 +526,16 @@ function apache-conf-create {
    fi
 }
 
+function youtube-download {
+  if [ $# -eq 0 ]
+    then
+        echo "Please insert URL"
+    else
+        yt-dlp "$1" -f 136 --output '%(title)s.%(ext)s'
+    fi
+
+}
+
 function requirements-django {
     req="requirements.txt"
     echo '' >  $req
@@ -548,9 +560,10 @@ function requirements-django {
 }
 
 export PATH="/home/ivanir/my_local/bin:$PATH"
-# Cuda
+# Cuda + Hyperpv
 export PATH="/usr/local/cuda-12.0/bin:$PATH"
 export LD_LIBRARY_PATH="/usr/local/cuda-12.0/lib64:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="/home/ivanir/my_config/lib:$LD_LIBRARY_PATH"
 
 #HyperPV
 alias hpv-start='sudo hyperpv-server-service-start'
@@ -584,3 +597,8 @@ PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
+# Hypv instalatio problems
+#sudo -u hyperpv /opt/hyperpv/hyperpv-server-start.sh
+#sudo /opt/hyperpv/utils/install/install-openmpi.sh
+#
+#
