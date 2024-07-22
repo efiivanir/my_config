@@ -1,9 +1,7 @@
 export PATH="/snap/bin:$PATH"
-#source /home/ivanir/my_config/shell-leuven/.bashrc
 export PATH="/home/ivanir/my_config/bin:$PATH"
 export PATH="/home/ivanir/my_config/my_py:$PATH"
-#export PATH="/home/ivanir/my_config/shell-extras-leuven/bin:$PATH"
-#export PATH="/home/ivanir/my_config/git-leuven/bin:$PATH"
+export PATH="/home/ivanir/.pyenv/bin:$PATH"
 
 OS_TYPE=`uname`
 export LC_CTYPE=en_US.UTF-8
@@ -52,6 +50,13 @@ alias catpart='cat /proc/partitions'
 
 # create etags for emacs source
 alias emacs-src-etags='find . -name '*.el' -print | etags -; find . -name '*.[ch]' -print | etags --append -'
+# emacs with debug
+alias gemacs='/usr/local/bin/emacs &'
+alias emacs-leuven='emacs -Q -l /home/ivanir/my_config/emacs-configs/emacs-leuven/init.el &'
+alias emacs-ivanir='emacs -Q -l /home/ivanir/emacs-config/init.el &'
+alias emacs-exord='emacs -Q -l /home/ivanir/my_config/emacs-configs/exordium/init.el &'
+alias emacs-tuhdo='emacs -Q -l /home/ivanir/my_config/emacs-configs/emacs-tuhdo/init.el &'
+alias emacs-spc='emacs -Q -l /home/ivanir/my_config/emacs-configs/spacemacs/init.el &'
 
 alias lt='ls -lat| more'
 alias cx='chmod 755 '
@@ -66,7 +71,7 @@ alias pyV='python3 -V'
 alias pymakeEnv='python3 -m venv venv'
 alias jup-not='jupyter-notebook  --allow-root'
 alias to_config='cd /home/ivanir/my_config'
-alias to_emacs='cd /home/ivanir/my_config/my_emacs'
+alias to_emacs='cd /home/ivanir/my_config/emacs-configs'
 
 
 # gcloud
@@ -531,7 +536,7 @@ function youtube-download {
     then
         echo "Please insert URL"
     else
-        yt-dlp "$1" -f 136 --output '%(title)s.%(ext)s'
+        yt-dlp --yes-playlist --output '%(title)s.%(ext)s'  "$1" 
     fi
 
 }
@@ -559,11 +564,9 @@ function requirements-django {
     done
 }
 
-export PATH="/home/ivanir/my_local/bin:$PATH"
-# Cuda + Hyperpv
-export PATH="/usr/local/cuda-12.0/bin:$PATH"
-export LD_LIBRARY_PATH="/usr/local/cuda-12.0/lib64:$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH="/home/ivanir/my_config/lib:$LD_LIBRARY_PATH"
+# Cuda
+export PATH=/usr/local/cuda-12.4/bin${PATH:+:${PATH}}
+export LD_LIBRARY_PATH=/usr/local/cuda-12.4/lib64
 
 #HyperPV
 alias hpv-start='sudo hyperpv-server-service-start'
@@ -574,7 +577,10 @@ alias to_hypv='cd /home/ivanir/Prog/py_dir/hypv'
 alias hpv-create-play='python /home/ivanir/Prog/py_dir/hypv/my_runs/create_playground_file.py '
 alias hpv-update-init='python /home/ivanir/Prog/py_dir/hypv/my_runs/update_init_tree.py'
 alias hpv-run-rule='/home/ivanir/Prog/py_dir/hypv/my_runs/run_rule.pl '
+alias hpv-run-clean='python /home/ivanir/Prog/py_dir/hypv/my_runs/run_clean_rule.py '
 alias hpv-create-ruledock='python /home/ivanir/Prog/py_dir/hypv/my_runs/create_ruledeck.py'
+
+#complete -W 'Mblk_ASIC_adc_PDK45_OK.gds Mblk_ASIC_as_PDK45_OK.gds Mblk_ASIC_dig_PDK45_OK.gds Mblk_ASIC_ldo_PDK45_OK.gds Top_Lvl_ASIC_adpak_PDK45_OK.gds' hpv-run-clean
 
 #Klayout
 #export KLAYOUT_PYTHONPATH='/home/ivanir/Prog/py_dir/KLayout-python;/usr/lib/python310.zip;/usr/lib/python3.10;/usr/lib/python3.10/lib-dynload;/usr/local/lib/python3.10/dist-packages;/usr/lib/python3/dist-packages'
@@ -587,6 +593,8 @@ alias kl-gdsfactory='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gdsfactory klayo
 alias kl-ltk='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/LTK klayout -e &'
 alias kl-kqc='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/KQC klayout -e &'
 alias kl-si4all='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/si4all klayout -e &'
+alias kl-gf22='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gf22 klayout'
+
 
 # Linux kernel programing
 export LLKD_KSRC=${HOME}/kernels/linux-5.4.231
@@ -602,3 +610,12 @@ export SDKMAN_DIR="$HOME/.sdkman"
 #sudo /opt/hyperpv/utils/install/install-openmpi.sh
 #
 #
+
+################# Hypv22 ###################################
+alias to_hypv22='cd /home/ivanir/Prog/py_dir/hypv22'
+
+alias hpv-create-play22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/create_playground_file.py '
+alias hpv-update-init22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/update_init_tree.py'
+alias hpv-run-rule22='/home/ivanir/Prog/py_dir/hypv22/my_runs/run_rule.pl '
+alias hpv-run-clean22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/run_clean_rule.py '
+alias hpv-create-ruledock22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/create_ruledeck.py'

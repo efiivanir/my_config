@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+export KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gf22
+klayout -e $1
+
