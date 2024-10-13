@@ -2,6 +2,9 @@ export PATH="/snap/bin:$PATH"
 export PATH="/home/ivanir/my_config/bin:$PATH"
 export PATH="/home/ivanir/my_config/my_py:$PATH"
 export PATH="/home/ivanir/.pyenv/bin:$PATH"
+#export PATH="/usr/local/gcc-14.1.0/bin:$PATH"
+
+#alias g++='/usr/local/gcc-14.1.0/bin/g++-14.1.0'
 
 OS_TYPE=`uname`
 export LC_CTYPE=en_US.UTF-8
@@ -594,6 +597,7 @@ alias kl-ltk='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/LTK klayout -e &'
 alias kl-kqc='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/KQC klayout -e &'
 alias kl-si4all='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/si4all klayout -e &'
 alias kl-gf22='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gf22 klayout'
+alias kl-epic='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/epic klayout'
 
 
 # Linux kernel programing
@@ -609,7 +613,8 @@ export SDKMAN_DIR="$HOME/.sdkman"
 #sudo -u hyperpv /opt/hyperpv/hyperpv-server-start.sh
 #sudo /opt/hyperpv/utils/install/install-openmpi.sh
 #
-#
+# Clean docker
+#sudo docker compose -f /opt/hyperpv/dockerfiles/ubuntu22/runtime-install.docker-compose.yaml  build --no-cache
 
 ################# Hypv22 ###################################
 alias to_hypv22='cd /home/ivanir/Prog/py_dir/hypv22'
