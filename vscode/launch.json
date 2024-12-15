@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+        "name": "CUDA C++: Launch GDB",
+        "type": "cuda-gdb",
+        "request": "launch",
+        "program": "${fileDirname}/${fileBasenameNoExtension}"
+    },
+    {
+        "name": "CUDA GDB Server: Launch",
+        "type": "cuda-gdbserver",
+        "request": "launch",
+        "server": "cuda-gdbserver",
+        "program": "",
+        "target": {
+            "host": "localhost",
+            "port": "12345"
+        },
+        "sysroot": "",
+        "debuggerPath": ""
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "cwd": "/home/ivanir/Prog/CUDA_Programing_With_C++",
+      "program": "/home/ivanir/Prog/CUDA_Programing_With_C++/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

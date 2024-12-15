@@ -3,6 +3,7 @@ export PATH="/home/ivanir/my_config/bin:$PATH"
 export PATH="/home/ivanir/my_config/my_py:$PATH"
 export PATH="/home/ivanir/.pyenv/bin:$PATH"
 #export PATH="/usr/local/gcc-14.1.0/bin:$PATH"
+export PATH="/usr/local/cuda/bin:$PATH"
 
 #alias g++='/usr/local/gcc-14.1.0/bin/g++-14.1.0'
 
@@ -567,9 +568,23 @@ function requirements-django {
     done
 }
 
+# Functions that allow to run C++23 import/export
+function comp-instead-import {
+  g++-14 --std=c++2b -fmodules-ts -xc++-system-header $1
+}
+
+function comp-interface-file {
+  g++-14 --std=c++2b -fmodules-ts -c -x c++ $1
+}
+
+function comp-all {
+  g++-14 --std=c++2b -fmodules-ts "$@"
+}
+
+
 # Cuda
-export PATH=/usr/local/cuda-12.4/bin${PATH:+:${PATH}}
-export LD_LIBRARY_PATH=/usr/local/cuda-12.4/lib64
+#export LD_LIBRARY_PATH=/usr/lib/nvidia-cuda-toolkit/compute-sanitizer
+#export LD_PRELOAD=/usr/lib/nvidia-cuda-toolkit/compute-sanitizer
 
 #HyperPV
 alias hpv-start='sudo hyperpv-server-service-start'
@@ -624,3 +639,29 @@ alias hpv-update-init22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/update_i
 alias hpv-run-rule22='/home/ivanir/Prog/py_dir/hypv22/my_runs/run_rule.pl '
 alias hpv-run-clean22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/run_clean_rule.py '
 alias hpv-create-ruledock22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/create_ruledeck.py'
+################################################################################################################
+#cmake
+alias cm-clean='cmake --build . --target clean'
+alias cm-cnf='cmake -S . -B ./build -G "Unix Makefiles" --fresh \
+  -DCMAKE_CXX_COMPILER="/usr/bin/g++-14" \
+  -DCMAKE_CXX_FLAGS="-Wall -Werror" \
+  -DCMAKE_BUILD_TYPE=Debug'
+
+alias cm-cnf-t='cm-cnf --trace-expand'
+alias cm-bld='cmake --build ./build/ --clean-first --parallel $(($(nproc)-1))'
+alias cm-bld-v='cm-bld --verbose'
+#############################################
+#easypref
+#
+function perf-create {
+   cmake -E make_directory build
+   cd build
+   cmake -DCMAKE_BUILD_TYPE=Release .. \
+        -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" \
+        -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18
+   cmake --build . --config Release --parallel 8
+   cmake --build . --target validateLab
+   cmake --build . --target benchmarkLab
+}
+#
+
