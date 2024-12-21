@@ -641,27 +641,15 @@ alias hpv-run-clean22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/run_clean_
 alias hpv-create-ruledock22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/create_ruledeck.py'
 ################################################################################################################
 #cmake
-alias cm-clean='cmake --build . --target clean'
-alias cm-cnf='cmake -S . -B ./build -G "Unix Makefiles" --fresh \
-  -DCMAKE_CXX_COMPILER="/usr/bin/g++-14" \
-  -DCMAKE_CXX_FLAGS="-Wall -Werror" \
-  -DCMAKE_BUILD_TYPE=Debug'
+#
+export IVANIR_CMAKE_TEMPLATES="$HOME/my_config/my-cmake-templates"
+source ${IVANIR_CMAKE_TEMPLATES}/basic-template.bash
 
-alias cm-cnf-t='cm-cnf --trace-expand'
-alias cm-bld='cmake --build ./build/ --clean-first --parallel $(($(nproc)-1))'
+alias scm-clean='cmake --build . --target clean'
+alias cm-cfg='cmake -S . -B ./build --fresh'
+#
+alias cm-cfg-t='cm-cnf --trace-expand'
+alias cm-bld='cmake --build ./build/ --parallel $(($(nproc)-1))'
 alias cm-bld-v='cm-bld --verbose'
-#############################################
-#easypref
-#
-function perf-create {
-   cmake -E make_directory build
-   cd build
-   cmake -DCMAKE_BUILD_TYPE=Release .. \
-        -DCMAKE_C_FLAGS="-g" -DCMAKE_CXX_FLAGS="-g" \
-        -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18
-   cmake --build . --config Release --parallel 8
-   cmake --build . --target validateLab
-   cmake --build . --target benchmarkLab
-}
-#
 
+alias cm-graph='mkdir -p build/graph && cd build/graph && cmake -S ../.. -B ..  --graphviz=graph.dot && dot -Tpng graph.dot -o graphImage.png'
