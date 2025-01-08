@@ -568,40 +568,8 @@ function requirements-django {
     done
 }
 
-# Functions that allow to run C++23 import/export
-function comp-instead-import {
-  g++-14 --std=c++2b -fmodules-ts -xc++-system-header $1
-}
-
-function comp-interface-file {
-  g++-14 --std=c++2b -fmodules-ts -c -x c++ $1
-}
-
-function comp-all {
-  g++-14 --std=c++2b -fmodules-ts "$@"
-}
-
-
-# Cuda
-#export LD_LIBRARY_PATH=/usr/lib/nvidia-cuda-toolkit/compute-sanitizer
-#export LD_PRELOAD=/usr/lib/nvidia-cuda-toolkit/compute-sanitizer
-
-#HyperPV
-alias hpv-start='sudo hyperpv-server-service-start'
-alias hpv-stop='sudo hyperpv-server-service-stop'
-alias hpv-status='hyperpv-server-status'
-alias to_hypv='cd /home/ivanir/Prog/py_dir/hypv'
-
-alias hpv-create-play='python /home/ivanir/Prog/py_dir/hypv/my_runs/create_playground_file.py '
-alias hpv-update-init='python /home/ivanir/Prog/py_dir/hypv/my_runs/update_init_tree.py'
-alias hpv-run-rule='/home/ivanir/Prog/py_dir/hypv/my_runs/run_rule.pl '
-alias hpv-run-clean='python /home/ivanir/Prog/py_dir/hypv/my_runs/run_clean_rule.py '
-alias hpv-create-ruledock='python /home/ivanir/Prog/py_dir/hypv/my_runs/create_ruledeck.py'
-
-#complete -W 'Mblk_ASIC_adc_PDK45_OK.gds Mblk_ASIC_as_PDK45_OK.gds Mblk_ASIC_dig_PDK45_OK.gds Mblk_ASIC_ldo_PDK45_OK.gds Top_Lvl_ASIC_adpak_PDK45_OK.gds' hpv-run-clean
 
 #Klayout
-#export KLAYOUT_PYTHONPATH='/home/ivanir/Prog/py_dir/KLayout-python;/usr/lib/python310.zip;/usr/lib/python3.10;/usr/lib/python3.10/lib-dynload;/usr/local/lib/python3.10/dist-packages;/usr/lib/python3/dist-packages'
 
 alias kl-sky130='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/sky130_klayout_pdk/sky130_tech klayout -e &'
 alias kl-free45='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/FreePDK45_for_KLayout klayout -e &'
@@ -615,41 +583,101 @@ alias kl-gf22='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gf22 klayout'
 alias kl-epic='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/epic klayout'
 
 
-# Linux kernel programing
-export LLKD_KSRC=${HOME}/kernels/linux-5.4.231
-
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 # Hypv instalatio problems
 #sudo -u hyperpv /opt/hyperpv/hyperpv-server-start.sh
 #sudo /opt/hyperpv/utils/install/install-openmpi.sh
-#
+#####################################################################################################################
 # Clean docker
 #sudo docker compose -f /opt/hyperpv/dockerfiles/ubuntu22/runtime-install.docker-compose.yaml  build --no-cache
+# remove all docker packages
+function remove-docker-pkg {
+  pkgs=(
+     'docker.io' 
+     'docker-doc' 
+     'docker-compose' 
+     'docker-compose-v2' 
+     'podman-docker' 
+     'containerd runc'
+    )
 
-################# Hypv22 ###################################
-alias to_hypv22='cd /home/ivanir/Prog/py_dir/hypv22'
+  for pkg in "${pkgs[@]}"; do 
+     sudo apt-get remove $pkg; 
+  
+  done
+}
 
-alias hpv-create-play22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/create_playground_file.py '
-alias hpv-update-init22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/update_init_tree.py'
-alias hpv-run-rule22='/home/ivanir/Prog/py_dir/hypv22/my_runs/run_rule.pl '
-alias hpv-run-clean22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/run_clean_rule.py '
-alias hpv-create-ruledock22='python /home/ivanir/Prog/py_dir/hypv22/my_runs/create_ruledeck.py'
-################################################################################################################
+function install-docker {
+  remove-docker-pkg
+
+  # Add Docker's official GPG key:
+  sudo apt-get update
+  sudo apt-get install ca-certificates curl
+  sudo install -m 0755 -d /etc/apt/keyrings
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+  # Add the repository to Apt sources:
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt-get update
+
+  sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+  sudo docker run hello-world
+}
+
+alias dock-hello='docker run hello-world'
+alias dock-ubuntu='docker run -it ubuntu bash'
+alias dock-ls='docker image list' 
+alias dock-rm='docker rmi --force '
+#########################################################################################################
 #cmake
 #
 export IVANIR_CMAKE_TEMPLATES="$HOME/my_config/my-cmake-templates"
-source ${IVANIR_CMAKE_TEMPLATES}/basic-template.bash
+#source ${IVANIR_CMAKE_TEMPLATES}/basic-template.bash
 
-alias scm-clean='cmake --build . --target clean'
-alias cm-cfg='cmake -S . -B ./build --fresh'
+alias cm-clean='cmake --build . --target clean'
+alias cm-cfg="cmake -S . -B ./build  -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 --fresh "
+alias cm-cfg-d='cm-cfg -DCMAKE_BUILD_TYPE=Debug'
+alias cm-cfg-r='cm-cfg -DCMAKE_BUILD_TYPE=Release'
 #
 alias cm-cfg-t='cm-cnf --trace-expand'
 alias cm-bld='cmake --build ./build/ --parallel $(($(nproc)-1))'
 alias cm-bld-v='cm-bld --verbose'
 
 alias cm-graph='mkdir -p build/graph && cd build/graph && cmake -S ../.. -B ..  --graphviz=graph.dot && dot -Tpng graph.dot -o graphImage.png'
+alias cm-doc='cmake --build ./build --config Debug --target docs'
+
+function cm-create-project {
+ 
+    cmds=(
+      'gh'
+      'perl'
+    )
+    for cmd in "${cmds[@]}"; do
+        if ! [ -x "$(command -v $cmd)" ]; then
+            echo "Error: $cmd is not installed." >&2
+            return 1
+        fi
+    done
+
+    if [ $# -ne 1 ]; then
+       echo "Usage: cm-create-project PROJECT_NAME"
+       return 1
+    fi
+
+    prj=$1
+    if test -d ${prj}; then
+        echo "Err: $prj exists. Please remove it, Or change project name."
+        return 1
+    fi
+    echo "Create cmake project ${prj}, based on my_cpp_cmake_template"
+    gh repo clone efiivanir/my_cpp_cmake_template ./${prj}
+    perl -p -i -e "s/MY_PROJECT Please_Change/MY_PROJECT $prj/" ./${prj}/CMakeLists.txt
+
+}
+
