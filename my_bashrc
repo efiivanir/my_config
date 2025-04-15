@@ -77,6 +77,8 @@ alias jup-not='jupyter-notebook  --allow-root'
 alias to_config='cd /home/ivanir/my_config'
 alias to_emacs='cd /home/ivanir/my_config/emacs-configs'
 
+alias vi_mybash='vi /home/ivanir/my_config/my_bashrc'
+
 
 # gcloud
 alias gc-cil='gcloud compute instances list'
@@ -202,6 +204,7 @@ alias gcc-list-c-options='gcc -xc -E -v -'
 
 alias to_prog='cd ~/Prog'
 alias to_py='cd ~/Prog/py_dir'
+alias to_down='cd ~/Downloads'
 
 function youtube-playlist() {
  id_replacement="'%(autonumber)s-%(title)s.%(ext)s'"
@@ -588,9 +591,11 @@ PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 # Hypv instalatio problems
 #sudo -u hyperpv /opt/hyperpv/hyperpv-server-start.sh
 #sudo /opt/hyperpv/utils/install/install-openmpi.sh
+#
+#Google Cloud
+export GOOGLE_APPLICATION_CREDENTIALS="/home/ivanir/Prog/py_dir/data-engineering-zoomcamp/week_01/2_docker_sql/dtc-de-449007-15eb317868d2.json"
 #####################################################################################################################
-# Clean docker
-#sudo docker compose -f /opt/hyperpv/dockerfiles/ubuntu22/runtime-install.docker-compose.yaml  build --no-cache
+# docker
 # remove all docker packages
 function remove-docker-pkg {
   pkgs=(
@@ -599,7 +604,8 @@ function remove-docker-pkg {
      'docker-compose' 
      'docker-compose-v2' 
      'podman-docker' 
-     'containerd runc'
+     'containerd' 
+     'runc'
     )
 
   for pkg in "${pkgs[@]}"; do 
@@ -634,6 +640,32 @@ alias dock-hello='docker run hello-world'
 alias dock-ubuntu='docker run -it ubuntu bash'
 alias dock-ls='docker image list' 
 alias dock-rm='docker rmi --force '
+alias dock-rm-all='docker rmi --force $(docker images -a -q)'
+
+alias dock-ny='docker run -it \
+    -e POSTGRES_USER="root" \
+    -e POSTGRES_PASSWORD="root" \
+    -e POSTGRES_DB="ny_taxi" \
+    -v $(pwd)/ny_taxi_postgres_data:/var/lib/postgresql/data \
+    --network=pg-network \
+    --name=pg-db \
+    -p 5432:5432 \
+    postgres:13'
+
+alias dock-bld-ingest='docker build -t ingest:v001 .'
+alias dock-run-ingest='docker run -it --network=pg-network ingest:v001 '
+
+alias ny-postgres-con='pgcli -h localhost -p 5432 -u root -d ny_taxi'
+
+alias dock-net='sudo docker network create pg-network'
+
+alias dock-pgadmin='docker run -it \
+    -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+    -e PGADMIN_DEFAULT_PASSWORD="root" \
+    -p 8080:80 \
+    --network=pg-network \
+    --name pg-admin \
+    dpage/pgadmin4'
 #########################################################################################################
 #cmake
 #
@@ -681,3 +713,4 @@ function cm-create-project {
 
 }
 
+#ls -1 *.cc | perl -nlae 's/\.cc//; print("add_executable\($_ $_.cc\)")'
