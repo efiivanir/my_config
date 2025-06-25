@@ -57,10 +57,10 @@ alias emacs-src-etags='find . -name '*.el' -print | etags -; find . -name '*.[ch
 # emacs with debug
 alias gemacs='/usr/local/bin/emacs &'
 alias emacs-leuven='emacs -Q -l /home/ivanir/my_config/emacs-configs/emacs-leuven/init.el &'
-alias emacs-ivanir='emacs -Q -l /home/ivanir/emacs-config/init.el &'
 alias emacs-exord='emacs -Q -l /home/ivanir/my_config/emacs-configs/exordium/init.el &'
 alias emacs-tuhdo='emacs -Q -l /home/ivanir/my_config/emacs-configs/emacs-tuhdo/init.el &'
 alias emacs-spc='emacs -Q -l /home/ivanir/my_config/emacs-configs/spacemacs/init.el &'
+alias emacs-latest='emacs -Q -l /home/ivanir/my_config/emacs-configs/latest/init.el &'
 
 alias lt='ls -lat| more'
 alias cx='chmod 755 '
@@ -714,3 +714,8 @@ function cm-create-project {
 }
 
 #ls -1 *.cc | perl -nlae 's/\.cc//; print("add_executable\($_ $_.cc\)")'
+#
+#
+#vspkg
+export VCPKG_ROOT=~/vcpkg
+export PATH=$VCPKG_ROOT:$PATH
