@@ -55,12 +55,7 @@ alias catpart='cat /proc/partitions'
 # create etags for emacs source
 alias emacs-src-etags='find . -name '*.el' -print | etags -; find . -name '*.[ch]' -print | etags --append -'
 # emacs with debug
-alias gemacs='/usr/local/bin/emacs &'
-alias emacs-leuven='emacs -Q -l /home/ivanir/my_config/emacs-configs/emacs-leuven/init.el &'
-alias emacs-exord='emacs -Q -l /home/ivanir/my_config/emacs-configs/exordium/init.el &'
-alias emacs-tuhdo='emacs -Q -l /home/ivanir/my_config/emacs-configs/emacs-tuhdo/init.el &'
-alias emacs-spc='emacs -Q -l /home/ivanir/my_config/emacs-configs/spacemacs/init.el &'
-alias emacs-latest='emacs -Q -l /home/ivanir/my_config/emacs-configs/latest/init.el &'
+alias emacs-ivanir='emacs -Q -l /home/ivanir/my_config/init.el &'
 
 alias lt='ls -lat| more'
 alias cx='chmod 755 '
@@ -204,6 +199,7 @@ alias gcc-list-c-options='gcc -xc -E -v -'
 
 alias to_prog='cd ~/Prog'
 alias to_py='cd ~/Prog/py_dir'
+alias to_lerner='cd ~/Prog/py_dir/lerner'
 alias to_down='cd ~/Downloads'
 
 function youtube-playlist() {
