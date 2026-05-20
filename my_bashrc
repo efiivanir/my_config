@@ -4,6 +4,8 @@ export PATH="/home/ivanir/my_config/my_py:$PATH"
 export PATH="/home/ivanir/.pyenv/bin:$PATH"
 #export PATH="/usr/local/gcc-14.1.0/bin:$PATH"
 export PATH="/usr/local/cuda/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
+export PATH="/opt/pycharm-2026.1.2/bin:$PATH"
 
 #alias g++='/usr/local/gcc-14.1.0/bin/g++-14.1.0'
 
