@@ -2,12 +2,9 @@ export PATH="/snap/bin:$PATH"
 export PATH="/home/ivanir/my_config/bin:$PATH"
 export PATH="/home/ivanir/my_config/my_py:$PATH"
 export PATH="/home/ivanir/.pyenv/bin:$PATH"
-#export PATH="/usr/local/gcc-14.1.0/bin:$PATH"
-export PATH="/usr/local/cuda/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 export PATH="/opt/pycharm-2026.1.2/bin:$PATH"
 
-#alias g++='/usr/local/gcc-14.1.0/bin/g++-14.1.0'
 
 OS_TYPE=`uname`
 export LC_CTYPE=en_US.UTF-8
@@ -218,37 +215,6 @@ function root-enable {
 }
 
 
-function rtl8821ae {
-    sudo modprobe rtl8821ae -r
-    sudo modprobe rtl8821ae
-    sudo lshw -C network
-    lsmod | grep rtl
-
-    git clone https://github.com/lwfinger/rtlwifi_new.git
-    chdir rtlwifi_new
-
-    sudo make
-    sudo make install
-    sudo reboot
-
-    iwlist scan | egrep -i 'ssid|level'
-
-    sudo modprobe -r rtl8821ae
-    sudo modprobe rtl8821ae ant_sel=1
-    iwlist scan | egrep -i 'ssid|level'
-
-    sudo modprobe -r rtl8821ae
-    sudo modprobe rtl8821ae ant_sel=2
-    iwlist scan | egrep -i 'ssid|level'
-
-
-}
-
-function rtl8821ae_up {
-    sudo modprobe -r rtl8821ae
-    sudo modprobe rtl8821ae ant_sel=2 fwlps=N msi=1 power_save=0 
-}
-
 function wicd_install {
     sudo apt-get install -d --reinstall network-manager network-manager-gnome 
     sudo apt-get install wicd-gtk 
@@ -266,10 +232,6 @@ function git_com_with_date {
     DATE=`date +%Y-%m-%d`
 }
 
-function flask-venv {
-    python3 -m venv venv
-    source venv/bin/activate
-}
 
 alias ac='source venv/bin/activate'
 alias deac='deactivate'
@@ -361,11 +323,6 @@ function samba-install {
     sudo smbpasswd -a ivanir
 }
 
-function npm-remove {
-    dpkg -l | grep -i node
-    sudo apt remove --purge node-* -y
-    sudo apt remove --purge nodejs -y
-}
 
 function webm2mp3 {
     for FILE in *.webm; do
@@ -569,30 +526,9 @@ function requirements-django {
     done
 }
 
-
-#Klayout
-
-alias kl-sky130='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/sky130_klayout_pdk/sky130_tech klayout -e &'
-alias kl-free45='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/FreePDK45_for_KLayout klayout -e &'
-alias kl-asap7='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/ASAP7_for_KLayout klayout -e &'
-alias kl-tsmc45='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/TSMC45 klayout -e &'
-alias kl-gdsfactory='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gdsfactory klayout -e &'
-alias kl-ltk='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/LTK klayout -e &'
-alias kl-kqc='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/KQC klayout -e &'
-alias kl-si4all='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/si4all klayout -e &'
-alias kl-gf22='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/gf22 klayout'
-alias kl-epic='KLAYOUT_HOME=/home/ivanir/Prog/klayout_dir/epic klayout'
-
-
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 
-# Hypv instalatio problems
-#sudo -u hyperpv /opt/hyperpv/hyperpv-server-start.sh
-#sudo /opt/hyperpv/utils/install/install-openmpi.sh
 #
-#Google Cloud
-export GOOGLE_APPLICATION_CREDENTIALS="/home/ivanir/Prog/py_dir/data-engineering-zoomcamp/week_01/2_docker_sql/dtc-de-449007-15eb317868d2.json"
-#####################################################################################################################
 # docker
 # remove all docker packages
 function remove-docker-pkg {
@@ -667,8 +603,6 @@ alias dock-pgadmin='docker run -it \
 #########################################################################################################
 #cmake
 #
-export IVANIR_CMAKE_TEMPLATES="$HOME/my_config/my-cmake-templates"
-#source ${IVANIR_CMAKE_TEMPLATES}/basic-template.bash
 
 alias cm-clean='cmake --build . --target clean'
 alias cm-cfg="cmake -S . -B ./build  -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 --fresh "
