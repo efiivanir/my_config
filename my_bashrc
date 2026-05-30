@@ -1,22 +1,29 @@
-export PATH="/snap/bin:$PATH"
-export PATH="/home/ivanir/my_config/bin:$PATH"
-export PATH="/home/ivanir/my_config/my_py:$PATH"
-export PATH="/home/ivanir/.pyenv/bin:$PATH"
-export PATH="/usr/local/bin:$PATH"
-export PATH="/opt/pycharm-2026.1.2/bin:$PATH"
+hst=`hostname`
+if [ $hst != 'rp5' ]
+then
+    export PATH="/snap/bin:$PATH"
+    export PATH="/home/ivanir/my_config/bin:$PATH"
+    export PATH="/home/ivanir/my_config/my_py:$PATH"
+    export PATH="/home/ivanir/.pyenv/bin:$PATH"
+    export PATH="/usr/local/bin:$PATH"
+    export PATH="/opt/pycharm-2026.1.2/bin:$PATH"
 
 
-OS_TYPE=`uname`
-export LC_CTYPE=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-export LANGUAGE=en_US.UTF-8
-export LANG=en_US.UTF-8
+    OS_TYPE=`uname`
+    export LC_CTYPE=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+    export LANGUAGE=en_US.UTF-8
+    export LANG=en_US.UTF-8
 
-export MAIL_USERNAME='efi.ivanir.unsc'
-export MAIL_PASSWORD='agoodpass'
-export MAIL_SERVER=smtp.googlemail.com
-export MAIL_PORT=587
-export MAIL_USE_TLS=1
+    export MAIL_USERNAME='efi.ivanir.unsc'
+    export MAIL_PASSWORD='agoodpass'
+    export MAIL_SERVER=smtp.googlemail.com
+    export MAIL_PORT=587
+    export MAIL_USE_TLS=1
+#vspkg
+    export VCPKG_ROOT=~/vcpkg
+    export PATH=$VCPKG_ROOT:$PATH
+fi
 
 
 
@@ -648,6 +655,3 @@ function cm-create-project {
 #ls -1 *.cc | perl -nlae 's/\.cc//; print("add_executable\($_ $_.cc\)")'
 #
 #
-#vspkg
-export VCPKG_ROOT=~/vcpkg
-export PATH=$VCPKG_ROOT:$PATH
