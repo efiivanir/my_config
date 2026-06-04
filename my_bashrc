@@ -25,6 +25,11 @@ then
     export PATH=$VCPKG_ROOT:$PATH
 fi
 
+if [ $hst == 'ThinkPad' ]
+then
+    echo "ThinkPad"
+
+fi
 
 
 #alias ch-locals='sudo locale-gen en_US.UTF-8;sudo dpkg-reconfigure locales'
