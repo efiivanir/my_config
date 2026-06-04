@@ -1,4 +1,5 @@
 hst=`hostname`
+export HOST=$hst
 if [ $hst != 'rp5' ]
 then
     export PATH="/snap/bin:$PATH"
