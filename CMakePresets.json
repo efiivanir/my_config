@@ -1,0 +1,123 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/install/${presetName}",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_COLOR_DIAGNOSTICS": "ON",
+        "CMAKE_VERBOSE_MAKEFILE": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release",
+      "installDir": "${sourceDir}/install/release",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_COMPILE_WARNING_AS_ERROR": "ON",
+        "ES_USE_SYSTEM_LIBRARIES": "OFF",
+        "BUILD_TESTING": "OFF"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "$env{CI}",
+        "rhs": "true"
+      }
+    },
+    {
+      "name": "linux-gcc",
+      "displayName": "Linux GCC",
+      "description": "Builds with the default host compiler on Linux",
+      "inherits": "base",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic",
+        "CMAKE_CXX_COMPILER": "g++"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "description": "Builds for Linux like an official release",
+      "inherits": "release",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
+        "VCPKG_HOST_TRIPLET": "linux64-release",
+        "VCPKG_TARGET_TRIPLET": "linux64-release"
+      }
+    },
+    {
+      "name": "linux-clang",
+      "displayName": "Linux Clang++",
+      "description": "Builds with the clang++ compiler",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++",
+        "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic",
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "hidden": true,
+      "configuration": "Debug"
+    },
+    {
+      "name": "release",
+      "hidden": true,
+      "configuration": "Release"
+    },
+    {
+      "name": "linux-gcc-debug",
+      "displayName": "Debug",
+      "configurePreset": "linux-gcc",
+      "inherits": "debug"
+    },
+    {
+      "name": "linux-gcc-release",
+      "displayName": "Release",
+      "configurePreset": "linux-gcc",
+      "inherits": "release"
+    },
+    {
+      "name": "linux-clang-debug",
+      "displayName": "Debug",
+      "configurePreset": "linux-clang",
+      "inherits": "debug"
+    },
+    {
+      "name": "linux-clang-release",
+      "displayName": "Release",
+      "configurePreset": "linux-clang",
+      "inherits": "release"
+    }
+  ],
+  "testPresets": [
+  ]
+}

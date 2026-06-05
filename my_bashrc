@@ -211,7 +211,6 @@ alias gcc-list-c-options='gcc -xc -E -v -'
 
 alias to_prog='cd ~/Prog'
 alias to_py='cd ~/Prog/py_dir'
-alias to_lerner='cd ~/Prog/py_dir/lerner'
 alias to_down='cd ~/Downloads'
 
 function youtube-playlist() {
