@@ -202,6 +202,8 @@ alias git-graph='git log --oneline --topo-order --graph'
 alias git-rm-local='git  rm --cached'
 alias git-pr-log='git log --date-order --graph --tags --simplify-by-decoration --pretty=format:"%ai %h %d"'
 alias git-sub-up='git submodule update --remote'
+alias git-token='git remote set-url origin https://<TOKEN>@github.com/efiivanir/<REPO>.git'
+
 
 alias heroku-push='git push heruko master'
 
