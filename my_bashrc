@@ -187,7 +187,7 @@ git config --global alias.st status
 git config --global alias.a add
 git config --global alias.lg1 "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all"
 git config --global alias.lg2 "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'"
-git config --global alias.lg3 "log --oneline --topo-order --graph"
+
 
 
 
@@ -198,6 +198,7 @@ alias git-reset-soft='git reset --soft HEAD^ '
 alias git-ch='git checkout '
 alias git-clean='git checkout -- .'
 alias git-show-remote='git remote --verbose'
+alias git-graph='git log --oneline --topo-order --graph'
 alias git-rm-local='git  rm --cached'
 alias git-pr-log='git log --date-order --graph --tags --simplify-by-decoration --pretty=format:"%ai %h %d"'
 alias git-sub-up='git submodule update --remote'
