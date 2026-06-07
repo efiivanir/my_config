@@ -1,10 +1,10 @@
 {
-  "version": 3,
+  "version": 8,
+  "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
   "configurePresets": [
     {
       "name": "base",
       "hidden": true,
-      "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "installDir": "${sourceDir}/install/${presetName}",
       "architecture": {
@@ -14,110 +14,151 @@
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_COLOR_DIAGNOSTICS": "ON",
-        "CMAKE_VERBOSE_MAKEFILE": "ON"
+        "CMAKE_VERBOSE_MAKEFILE": "ON",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF"
       }
     },
     {
-      "name": "release",
+      "name": "base-debug",
       "hidden": true,
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/release",
-      "installDir": "${sourceDir}/install/release",
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INTDIR": "Debug"
+      }
+    },
+    {
+      "name": "base-release",
+      "hidden": true,
+      "inherits": "base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_COMPILE_WARNING_AS_ERROR": "ON",
-        "ES_USE_SYSTEM_LIBRARIES": "OFF",
-        "BUILD_TESTING": "OFF"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "$env{CI}",
-        "rhs": "true"
+        "CMAKE_INTDIR": "Release"
       }
     },
     {
-      "name": "linux-gcc",
-      "displayName": "Linux GCC",
-      "description": "Builds with the default host compiler on Linux",
+      "name": "base-make",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Unix Makefiles"
+    },
+    {
+      "name": "base-ninja",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Ninja Multi-Config"
+    },
+    {
+      "name": "base-g++",
+      "hidden": true,
+      "inherits": "base",
+        "cacheVariables": {
+          "CMAKE_CXX_COMPILER": "g++"
+        }
+    },
+    {
+      "name": "base-clang",
+      "hidden": true,
       "inherits": "base",
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic",
-        "CMAKE_CXX_COMPILER": "g++"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
+        "CMAKE_CXX_COMPILER": "clang++"
       }
     },
+
+
     {
-      "name": "linux-release",
-      "displayName": "Linux Release",
-      "description": "Builds for Linux like an official release",
-      "inherits": "release",
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER_LAUNCHER": "sccache",
-        "VCPKG_HOST_TRIPLET": "linux64-release",
-        "VCPKG_TARGET_TRIPLET": "linux64-release"
-      }
+      "name": "g++-ninja-debug",
+      "hidden": false,
+      "inherits": ["base-g++","base-ninja","base-debug"]
+
     },
     {
-      "name": "linux-clang",
-      "displayName": "Linux Clang++",
-      "description": "Builds with the clang++ compiler",
-      "inherits": "base",
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang++",
-        "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic",
-        "CMAKE_BUILD_TYPE": "Debug"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
+      "name": "g++-ninja-release",
+      "hidden": false,
+      "inherits": ["base-g++","base-ninja","base-release"]
+
+    },
+    {
+      "name": "clang-ninja-debug",
+      "hidden": false,
+      "inherits": ["base-clang","base-ninja","base-debug"]
+
+    },
+    {
+      "name": "clang-ninja-release",
+      "hidden": false,
+      "inherits": ["base-clang","base-ninja","base-release"]
+
+    },
+
+    {
+      "name": "g++-make-debug",
+      "hidden": false,
+      "inherits": ["base-g++","base-make","base-debug"]
+
+    },
+    {
+      "name": "g++-make-release",
+      "hidden": false,
+      "inherits": ["base-g++","base-make","base-release"]
+
+    },
+    {
+      "name": "clang-make-debug",
+      "hidden": false,
+      "inherits": ["base-clang","base-make","base-debug"]
+
+    },
+    {
+      "name": "clang-make-release",
+      "hidden": false,
+      "inherits": ["base-clang","base-make","base-release"]
+
     }
   ],
   "buildPresets": [
     {
-      "name": "debug",
-      "hidden": true,
-      "configuration": "Debug"
+      "name": "clang-ninja-release",
+      "displayName": "clang-ninja-release",
+      "configurePreset": "clang-ninja-release"
     },
     {
-      "name": "release",
-      "hidden": true,
-      "configuration": "Release"
+      "name": "clang-ninja-debug",
+      "displayName": "clang-ninja-debug",
+      "configurePreset": "clang-ninja-debug"
     },
     {
-      "name": "linux-gcc-debug",
-      "displayName": "Debug",
-      "configurePreset": "linux-gcc",
-      "inherits": "debug"
+      "name": "g++-ninja-release",
+      "displayName": "g++-ninja-release",
+      "configurePreset": "g++-ninja-release"
     },
     {
-      "name": "linux-gcc-release",
-      "displayName": "Release",
-      "configurePreset": "linux-gcc",
-      "inherits": "release"
+      "name": "g++-ninja-debug",
+      "displayName": "g++-ninja-debug",
+      "configurePreset": "g++-ninja-debug"
+    },
+
+    {
+      "name": "clang-make-release",
+      "displayName": "clang-make-release",
+      "configurePreset": "clang-make-release"
     },
     {
-      "name": "linux-clang-debug",
-      "displayName": "Debug",
-      "configurePreset": "linux-clang",
-      "inherits": "debug"
+      "name": "clang-make-debug",
+      "displayName": "clang-make-debug",
+      "configurePreset": "clang-make-debug"
     },
     {
-      "name": "linux-clang-release",
-      "displayName": "Release",
-      "configurePreset": "linux-clang",
-      "inherits": "release"
+      "name": "g++-make-release",
+      "displayName": "g++-make-release",
+      "configurePreset": "g++-make-release"
+    },
+    {
+      "name": "g++-make-debug",
+      "displayName": "g++-make-debug",
+      "configurePreset": "g++-make-debug"
     }
-  ],
-  "testPresets": [
   ]
 }
