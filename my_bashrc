@@ -663,6 +663,22 @@ function cm-create-project {
 
 }
 
+function git-add-token {
+  func_name=${FUNCNAME[0]}
+  if [ $# -ne 1 ]; then
+       echo "Usage: $func_name GIT_TOKEN"
+       return 1
+  fi
+
+  token=$1
+  rep_name=$(basename "$PWD")
+  rep_own='efiivanir'
+  cmd_name="git remote set-url origin https://${token}@github.com/${rep_own}/${rep_name}.git"
+  echo $cmd_name
+  eval "${cmd_name[@]}"
+  
+}
+
 #ls -1 *.cc | perl -nlae 's/\.cc//; print("add_executable\($_ $_.cc\)")'
 #
 #
